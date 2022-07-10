@@ -1,4 +1,5 @@
 import 'package:dbu_push/screens/main_screen.dart';
+import 'package:dbu_push/widgets/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -18,6 +19,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+        fontFamily:'Roboto',
+        primaryColor: primaryColor,
         primarySwatch: Colors.blue,
       ),
       home: const MainPage(),
