@@ -15,7 +15,7 @@ class MainPage extends StatelessWidget {
           child: Column(
             // ignore: prefer_const_literals_to_create_immutables
             children: [
-              AppText.HeaderText('Title text ss'),
+              AppText.HeaderText('Title text'),
               AppText.ContentText(
                   'This is the paragraph text This is the paragraph textThis is the paragraph text'
                   'This is the paragraph text This is the paragraph text This is the paragraph text'
