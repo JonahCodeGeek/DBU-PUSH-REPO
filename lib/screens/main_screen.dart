@@ -15,13 +15,16 @@ class MainPage extends StatelessWidget {
           child: Column(
             // ignore: prefer_const_literals_to_create_immutables
             children: [
-              AppText.HeaderText('Title text'),
+              AppText.HeaderText('Title text ss'),
               AppText.ContentText(
                   'This is the paragraph text This is the paragraph textThis is the paragraph text'
                   'This is the paragraph text This is the paragraph text This is the paragraph text'
                   'This is the paragraph text'),
               AppText.ReferenceText(
                   'This will be a fade out text like @Jonah code'),
+              ElevatedButton(
+                  onPressed: () => {},
+                  child: Text('This will be a fade out text like @Jonah code'))
             ],
           ),
         ),
