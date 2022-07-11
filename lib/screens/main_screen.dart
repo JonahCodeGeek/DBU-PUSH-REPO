@@ -21,10 +21,11 @@ class MainPage extends StatelessWidget {
                   'This is the paragraph text This is the paragraph text This is the paragraph text'
                   'This is the paragraph text'),
               AppText.ReferenceText(
-                  'This will be a fade out text like @Jonah code'),
+                  'This will be a for usernames like @Jonah_code'),
               ElevatedButton(
                   onPressed: () => {},
-                  child: Text('This will be a fade out text like @Jonah code'))
+                  child:
+                      Text('This is to see that the primary color is working.'))
             ],
           ),
         ),
