@@ -1,4 +1,3 @@
-import 'package:dbu_push/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreenTwo extends StatelessWidget {
