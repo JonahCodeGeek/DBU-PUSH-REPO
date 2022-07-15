@@ -19,7 +19,7 @@ class DbuPush extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'DBU PUSH ',
       theme: appLightTheme(),
-      home: MainPage(),
+      home:MainPage(),
     );
   }
 }
