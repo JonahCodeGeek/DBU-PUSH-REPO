@@ -10,10 +10,8 @@ class CreateChannels extends StatefulWidget {
 class _CreateChannelsState extends State<CreateChannels> {
   @override
   Widget build(BuildContext context) {
-    return  Container(
-      child: Center(
-        child: Text('CreateChannels'),
-      ),
+    return  Center(
+      child: Text('CreateChannels'),
     );
   }
 }

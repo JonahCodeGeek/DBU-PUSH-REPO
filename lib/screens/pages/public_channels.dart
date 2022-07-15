@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PublicChannels extends StatefulWidget {
-  PublicChannels({Key? key}) : super(key: key);
+  const PublicChannels({Key? key}) : super(key: key);
 
   @override
   State<PublicChannels> createState() => _PublicChannelsState();
