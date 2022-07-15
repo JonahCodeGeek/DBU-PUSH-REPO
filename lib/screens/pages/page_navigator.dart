@@ -7,13 +7,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PageNavigator extends StatefulWidget {
-  PageNavigator({Key? key}) : super(key: key);
+  const PageNavigator({Key? key}) : super(key: key);
 
   @override
   State<PageNavigator> createState() => _PageNavigatorState();
 }
 
 class _PageNavigatorState extends State<PageNavigator> {
+ 
   int pageIndex = 1;
 
    PageController? pageController;
@@ -48,7 +49,7 @@ class _PageNavigatorState extends State<PageNavigator> {
         onPageChanged: onPageChanged,
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
-        children: [
+        children: const [
           Notfications(),
           Home(),
           PrivateChannels(),
