@@ -1,4 +1,4 @@
-import 'package:dbu_push/screens/pages/page_navigator.dart';
+import 'package:dbu_push/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'utils/Theme/app_theme.dart';
@@ -19,7 +19,7 @@ class DbuPush extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'DBU PUSH ',
       theme: appLightTheme(),
-      home: PageNavigator(),
+      home:MainPage(),
     );
   }
 }
