@@ -1,28 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User {
-  final String id;
-  final String fullName;
-  final String email;
-  final String phone;
-  final String uId;
-  final String role;
-  final String channelId;
-  final String avatar;
-  final String bio;
-  final bool isActive;
+  final String? id;
+  final String? fullName;
+  final String? email;
+  final String? phone;
+  final String? uId;
+  final String? role;
+  final String? channelId;
+  final String? avatar;
+  final String? bio;
+  final bool? isActive;
 
   User({
-    required this.id,
-    required this.fullName,
-    required this.email,
-    required this.phone,
-    required this.uId,
-    required this.role,
-    required this.channelId,
-    required this.avatar,
-    required this.bio,
-    required this.isActive,
+     this.id,
+     this.fullName,
+     this.email,
+     this.phone,
+     this.uId,
+     this.role,
+     this.channelId,
+     this.avatar,
+     this.bio,
+     this.isActive,
   });
   factory User.fromDocument(DocumentSnapshot doc) {
     return User(
