@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
+import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/progress.dart';
@@ -25,7 +28,7 @@ class _ProfileState extends State<Profile> {
         User user = User.fromDocument(snapshot.data!);
 
         return Padding(
-          padding: EdgeInsets.only(top:60),
+          padding: EdgeInsets.only(top: 60),
           child: Column(
             children: [
               Stack(
@@ -80,7 +83,6 @@ class _ProfileState extends State<Profile> {
                 fontSize: 22),
           ),
           SizedBox(
-           
             height: 10,
           ),
           Text(
@@ -91,17 +93,97 @@ class _ProfileState extends State<Profile> {
                 fontWeight: FontWeight.normal,
                 fontSize: 12),
           ),
-          Divider(
-            height: 8.0,
-            color: AppColors.primaryColor,
-          )
         ],
       ),
     );
   }
 
   Widget buildProfileBody() {
-    return Text('profile body');
+    return Padding(
+      padding: const EdgeInsets.only(left: 50, right: 30),
+      child: Column(
+        children: [
+          Card(
+            color: Colors.white70,
+            shadowColor: Colors.white54,
+            child: GestureDetector(
+              onTap: () => print('hello home'),
+              child: ListTile(
+                leading: Icon(Icons.home),
+                title: Text('Home'),
+              ),
+            ),
+          ),
+          Card(
+            color: Colors.white70,
+            shadowColor: Colors.white54,
+            child: GestureDetector(
+              onTap: () => print('hello notfications'),
+              child: ListTile(
+                leading: Icon(Icons.notifications),
+                title: Text('Notfications'),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Card(
+            color: Colors.white70,
+            shadowColor: Colors.white54,
+            child: GestureDetector(
+              onTap: () => print('new channel'),
+              child: ListTile(
+                leading: Icon(Icons.telegram),
+                title: Text('New Channel'),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Card(
+            color: Colors.white70,
+            shadowColor: Colors.white54,
+            child: GestureDetector(
+              onTap: () => print('private channels'),
+              child: ListTile(
+                leading: Icon(Icons.group_work),
+                title: Text('private channels'),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Card(
+            color: Colors.white70,
+            shadowColor: Colors.white54,
+            child: GestureDetector(
+              onTap: () => print('public channels'),
+              child: ListTile(
+                leading: Icon(Icons.podcasts),
+                title: Text('public channels'),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Card(
+            color: Colors.white70,
+            shadowColor: Colors.white54,
+            child: GestureDetector(
+              onTap: () => print('logout'),
+              child: ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('logout'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -110,6 +192,7 @@ class _ProfileState extends State<Profile> {
       body: ListView(
         children: [
           buildProfileHeader(),
+          Divider(),
           buildProfileBody(),
         ],
       ),
