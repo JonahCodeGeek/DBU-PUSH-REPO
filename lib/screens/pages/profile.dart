@@ -25,7 +25,7 @@ class _ProfileState extends State<Profile> {
         User user = User.fromDocument(snapshot.data!);
 
         return Padding(
-          padding: EdgeInsets.all(60),
+          padding: EdgeInsets.only(top:60),
           child: Column(
             children: [
               Stack(
@@ -69,7 +69,7 @@ class _ProfileState extends State<Profile> {
           ),
           SizedBox(
             width: double.infinity,
-            height: 5,
+            height: 10,
           ),
           Text(
             textAlign: TextAlign.center,
@@ -80,8 +80,8 @@ class _ProfileState extends State<Profile> {
                 fontSize: 22),
           ),
           SizedBox(
-            width: double.infinity,
-            height: 5,
+           
+            height: 10,
           ),
           Text(
             // textAlign: TextAlign.center,
@@ -92,7 +92,7 @@ class _ProfileState extends State<Profile> {
                 fontSize: 12),
           ),
           Divider(
-            height: 4.0,
+            height: 8.0,
             color: AppColors.primaryColor,
           )
         ],
