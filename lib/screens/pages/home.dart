@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
+import 'package:dbu_push/screens/pages/create_channels.dart';
 import 'package:dbu_push/screens/pages/profile.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
@@ -17,9 +18,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  User? currentUser;
   tapProfile() {
     Navigator.push(
-        context, MaterialPageRoute(builder: ((context) => Profile())));
+      context,
+      MaterialPageRoute(
+        builder: ((context) => Profile(
+              profileId: currentUser?.id,
+            )),
+      ),
+    );
   }
 
   @override
@@ -37,6 +45,14 @@ class _HomeState extends State<Home> {
                   showSearch(context: context, delegate: ContentSearch());
                 }),
             actions: [
+              // GestureDetector(
+              //   onTap: tapProfile,
+              //   child: CircleAvatar(
+              //     backgroundColor: Colors.grey,
+              //     backgroundImage:
+              //         CachedNetworkImageProvider(currentUser!.avatar!),
+              //   ),
+              // ),
               CircleButton(
                   icon: Icons.account_circle,
                   iconSize: 30,
@@ -44,6 +60,16 @@ class _HomeState extends State<Home> {
             ],
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primaryColor,
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => CreateChannels()),
+          ),
+        ),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -110,6 +136,7 @@ class ContentSearch extends SearchDelegate {
         if (query == '') {
           return BuildNoContent();
         }
+
         snapshot.data?.docs.map((doc) {
           User user = User.fromDocument(doc);
           UserResult results = UserResult(user);
