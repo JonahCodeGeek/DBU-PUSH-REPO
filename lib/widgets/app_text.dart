@@ -4,50 +4,55 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/Theme/app_colors.dart';
 
-class AppText {
-  final String text = '';
-  final Color? color = null;
+class OnboardingText extends StatelessWidget {
+  final String? coloredText, normalText, lightText, sloganText;
+  const OnboardingText(
+      {Key? key,
+      this.sloganText,
+      this.coloredText,
+      this.normalText,
+      this.lightText})
+      : super(key: key);
 
-  static Widget HeaderText(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        textAlign: TextAlign.left,
-        style: GoogleFonts.roboto(
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: AppColors.textColor1,
-        ),
-      ),
-    );
-  }
-
-  static Widget ContentText(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        textAlign: TextAlign.left,
-        style: GoogleFonts.roboto(
-          fontWeight: FontWeight.normal,
-          fontSize: 15,
-          color: AppColors.textColor2,
-        ),
-      ),
-    );
-  }
-
-  static Widget ReferenceText(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: GoogleFonts.roboto(
-          fontWeight: FontWeight.normal,
-          fontSize: 13,
-          color: AppColors.textColor3,
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+      child: RichText(
+        textAlign: TextAlign.start,
+        text: TextSpan(
+          text: coloredText,
+          style: GoogleFonts.roboto(
+            color: AppColors.primaryColor,
+            fontSize: 50,
+            fontWeight: FontWeight.w800,
+          ),
+          children: <TextSpan>[
+            TextSpan(
+              text: normalText,
+              style: GoogleFonts.roboto(
+                color: AppColors.textColor1,
+                fontSize: 50,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            TextSpan(
+              text: lightText,
+              style: GoogleFonts.roboto(
+                color: AppColors.textColor3,
+                fontSize: 23,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+            TextSpan(
+              text: sloganText,
+              style: GoogleFonts.robotoCondensed(
+                  color: AppColors.textColor3,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic),
+            ),
+          ],
         ),
       ),
     );
