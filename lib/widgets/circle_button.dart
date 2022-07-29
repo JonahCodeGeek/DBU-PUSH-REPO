@@ -1,4 +1,3 @@
-import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CircleButton extends StatelessWidget {
@@ -12,10 +11,12 @@ class CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(6),
+      margin: EdgeInsets.fromLTRB(0.0,12,0,0),
       decoration:
-          BoxDecoration(color: AppColors.primaryColor, shape: BoxShape.circle),
+          BoxDecoration(color:Colors.transparent, shape: BoxShape.circle),
       child: IconButton(
+        // color: Colors.white,
+        color: Colors.black,
           onPressed: onPressed,
           icon: Icon(
             icon,

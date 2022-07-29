@@ -1,9 +1,7 @@
-import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
-import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/progress.dart';
