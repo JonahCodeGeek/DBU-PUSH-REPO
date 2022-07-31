@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Animation/ FadeAnimation.dart';
 import '../../utils/Theme/app_colors.dart';
 import '../../utils/helpers/custom_functions.dart.dart';
+import '../Auth/registration_screen.dart';
 
 class WelcomeScreenTwo extends StatelessWidget {
   const WelcomeScreenTwo({Key? key}) : super(key: key);
@@ -22,16 +24,22 @@ class WelcomeScreenTwo extends StatelessWidget {
           Column(
             children: [
               //Header text
-              OnboardingText(
-                  coloredText: 'No ',
-                  normalText: 'More       Fake News                     ',
-                  lightText: 'Get informed directly from'
-                      ' the    people you trust in the university.'),
+              FadeAnimation(
+                1.5,
+                OnboardingText(
+                    coloredText: 'No ',
+                    normalText: 'More       Fake News                     ',
+                    lightText: 'Get informed directly from'
+                        ' the    people you trust in the university.'),
+              ),
               VerticalSpacer(90),
               //Picture
-              SvgPicture.asset(
-                'assets/images/undraw_educator.svg',
-                height: 250,
+              FadeAnimation(
+                3,
+                SvgPicture.asset(
+                  'assets/images/undraw_educator.svg',
+                  height: 250,
+                ),
               ),
               VerticalSpacer(180),
               Padding(
@@ -39,12 +47,21 @@ class WelcomeScreenTwo extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Skip >',
-                      style: GoogleFonts.roboto(
-                        color: AppColors.textColor1,
-                        fontSize: 24,
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return RegistrationScreen();
+                        },
+                      ));
+                    },
+                    child: FadeAnimation(
+                      4,
+                      Text(
+                        'Skip >',
+                        style: GoogleFonts.roboto(
+                          color: AppColors.textColor1,
+                          fontSize: 24,
+                        ),
                       ),
                     ),
                   ),
