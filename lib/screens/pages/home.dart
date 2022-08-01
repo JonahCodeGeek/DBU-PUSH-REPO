@@ -11,6 +11,7 @@ import 'package:dbu_push/widgets/progress.dart';
 import 'package:dbu_push/widgets/user_list_tile.dart';
 import 'package:flutter/material.dart';
 
+User? currentUser;
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -19,7 +20,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  User? currentUser;
+  
   tapProfile() {
     Navigator.push(
       context,
@@ -43,19 +44,19 @@ class _HomeState extends State<Home> {
             floating: true,
             leading: CircleButton(
               icon: Icons.search_rounded,
-              iconSize:35,
+              iconSize: 35,
               onPressed: () {
                 showSearch(context: context, delegate: ContentSearch());
               },
             ),
-           
+
             actions: [
               Container(
                 margin: EdgeInsets.fromLTRB(0.0, 12.0, 12, 0),
                 child: GestureDetector(
                   onTap: tapProfile,
                   child: CircleAvatar(
-                    radius:17.5,
+                    radius: 17.5,
                     backgroundColor: Colors.grey,
                     backgroundImage:
                         CachedNetworkImageProvider(currentUser?.avatar ?? ''),

@@ -1,9 +1,10 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
+import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
+import 'package:dbu_push/widgets/build_text_field.dart';
 import 'package:dbu_push/widgets/progress.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
@@ -16,184 +17,156 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  buildProfileHeader() {
+  final currentUserId = currentUser?.id;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController bioController = TextEditingController();
+  TextEditingController idController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  bool isProfileOwner = true;
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isProfileOwner = false;
+    });
+  }
+
+  buildProfile() {
+    // isProfileOwner = widget.profileId == currentUserId;
     return FutureBuilder<DocumentSnapshot>(
-      future: usersDoc.doc('O6DlpswReyWvbFnjUbHA').get(),
-      builder: (context, snapshot) {
+      builder: ((context, snapshot) {
         if (!snapshot.hasData) {
           return circularProgress();
         }
         User user = User.fromDocument(snapshot.data!);
-
-        return Padding(
-          padding: EdgeInsets.only(top: 60),
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 64,
-                    backgroundColor: Colors.grey,
-                    backgroundImage: CachedNetworkImageProvider(user.avatar!),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 4,
-                    child: GestureDetector(
-                      child: buildIconButton(AppColors.primaryColor),
-                      //on tap edit profile
-                      onTap: () => print(' profile buttontapped'),
+        nameController.text = user.fullName!;
+        bioController.text = user.bio!;
+        idController.text = user.uId!;
+        phoneController.text = user.phone!;
+        emailController.text = user.email!;
+        if (isProfileOwner) {
+          return Padding(
+            padding: EdgeInsets.only(top: 60),
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    CircleAvatar(
+                        radius: 64,
+                        backgroundColor: Colors.grey,
+                        backgroundImage:
+                            CachedNetworkImageProvider(user.avatar ?? '')),
+                    Positioned(
+                      bottom: 0,
+                      right: 4,
+                      child: GestureDetector(
+                        child: buildIconButton(AppColors.primaryColor),
+                        onTap: () => print('change your photo'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              buildUserInfo(user)
-            ],
-          ),
-        );
-      },
+                  ],
+                ),
+                buildEditInfo(),
+              ],
+            ),
+          );
+        } else {
+          return Padding(
+            padding: EdgeInsets.only(top: 60),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 64,
+                  backgroundColor: Colors.grey,
+                  backgroundImage:
+                      CachedNetworkImageProvider(user.avatar ?? ''),
+                ),
+                buildUserInfo(user),
+              ],
+            ),
+          );
+        }
+      }),
+      future: usersDoc.doc('O6DlpswReyWvbFnjUbHA').get(),
     );
   }
 
   Padding buildUserInfo(User user) {
     return Padding(
-      padding: EdgeInsets.only(top: 16),
+      padding: EdgeInsets.only(top: 16, left: 16),
       child: Column(
         children: [
-          Text(
-            textAlign: TextAlign.center,
-            user.fullName!,
-            style: TextStyle(
-                color: AppColors.textColor1,
-                fontWeight: FontWeight.bold,
-                fontSize: 30),
+          BuildTextField(
+            readOnly: false,
+            nameController: nameController,
+            textName: 'FullName',
+            giveHintText: '',
           ),
-          SizedBox(
-            width: double.infinity,
-            height: 10,
+          BuildTextField(
+            readOnly:false,
+            nameController: emailController,
+            textName: 'Email',
+            giveHintText: '',
           ),
-          Text(
-            textAlign: TextAlign.center,
-            user.phone!,
-            style: TextStyle(
-                color: AppColors.textColor2,
-                fontWeight: FontWeight.w300,
-                fontSize: 22),
+          BuildTextField(
+            nameController: phoneController,
+            textName: 'Phone',
+            giveHintText: '', readOnly: false
           ),
-          SizedBox(
-            height: 10,
+          BuildTextField(
+            readOnly: false,
+            nameController: bioController,
+            textName: 'Bio',
+            giveHintText: '',
           ),
-          Text(
-            // textAlign: TextAlign.center,
-            user.bio!,
-            style: TextStyle(
-                color: AppColors.textColor3,
-                fontWeight: FontWeight.normal,
-                fontSize: 12),
+          BuildTextField(
+            readOnly: false,
+            nameController: idController,
+            textName: 'Id',
+            giveHintText: '',
           ),
         ],
       ),
     );
   }
 
-  Widget buildProfileBody() {
+  Widget buildEditInfo() {
     return Padding(
-      padding: const EdgeInsets.only(left: 50, right: 30),
+      padding: EdgeInsets.only(top: 16, left: 16),
       child: Column(
         children: [
-          Card(
-            color: Colors.white70,
-            shadowColor: Colors.white54,
-            child: GestureDetector(
-              onTap: () => print('hello home'),
-              child: ListTile(
-                leading: Icon(Icons.home),
-                title: Text('Home'),
-              ),
-            ),
+          BuildTextField(
+            readOnly: true,
+            nameController: nameController,
+            textName: 'FullName',
+            giveHintText: 'update your name',
           ),
-          Card(
-            color: Colors.white70,
-            shadowColor: Colors.white54,
-            child: GestureDetector(
-              onTap: () => print('hello notfications'),
-              child: ListTile(
-                leading: Icon(Icons.notifications),
-                title: Text('Notfications'),
-              ),
-            ),
+          BuildTextField(
+            readOnly: true,
+            nameController: bioController,
+            textName: 'Bio',
+            giveHintText: 'update Your bio',
           ),
-          SizedBox(
-            height: 5,
-          ),
-          Card(
-            color: Colors.white70,
-            shadowColor: Colors.white54,
-            child: GestureDetector(
-              onTap: () => print('new channel'),
-              child: ListTile(
-                leading: Icon(Icons.telegram),
-                title: Text('New Channel'),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Card(
-            color: Colors.white70,
-            shadowColor: Colors.white54,
-            child: GestureDetector(
-              onTap: () => print('private channels'),
-              child: ListTile(
-                leading: Icon(Icons.group_work),
-                title: Text('private channels'),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Card(
-            color: Colors.white70,
-            shadowColor: Colors.white54,
-            child: GestureDetector(
-              onTap: () => print('public channels'),
-              child: ListTile(
-                leading: Icon(Icons.podcasts),
-                title: Text('public channels'),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Card(
-            color: Colors.white70,
-            shadowColor: Colors.white54,
-            child: GestureDetector(
-              onTap: () => print('logout'),
-              child: ListTile(
-                leading: Icon(Icons.logout),
-                title: Text('logout'),
-              ),
-            ),
+          BuildTextField(
+            readOnly: true,
+            nameController: idController,
+            textName: 'Id',
+            giveHintText: 'update Your Id',
           ),
         ],
       ),
     );
   }
+
+  
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          buildProfileHeader(),
-          Divider(),
-          buildProfileBody(),
-        ],
-      ),
+      body: buildProfile()
     );
   }
 }
+
