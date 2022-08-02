@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
@@ -8,6 +10,7 @@ import 'package:dbu_push/widgets/build_text_field.dart';
 import 'package:dbu_push/widgets/progress.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key, required this.profileId}) : super(key: key);
@@ -24,6 +27,8 @@ class _ProfileState extends State<Profile> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool isProfileOwner = true;
+  File? file;
+  final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
     super.initState();
@@ -32,8 +37,17 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  takePhoto(ImageSource source) async {
+    XFile? file = await _picker.pickImage(
+      source: source,
+    );
+    setState(() {
+      this.file = File(file!.path);
+    });
+  }
+
   buildProfile() {
-    // isProfileOwner = widget.profileId == currentUserId;
+    isProfileOwner = widget.profileId == currentUserId;
     return FutureBuilder<DocumentSnapshot>(
       builder: ((context, snapshot) {
         if (!snapshot.hasData) {
@@ -53,21 +67,32 @@ class _ProfileState extends State<Profile> {
                 Stack(
                   children: [
                     CircleAvatar(
-                        radius: 64,
-                        backgroundColor: Colors.grey,
-                        backgroundImage:
-                            CachedNetworkImageProvider(user.avatar ?? '')),
+                      radius: 64,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: CachedNetworkImageProvider(user.avatar!),
+                    ),
                     Positioned(
                       bottom: 0,
                       right: 4,
                       child: GestureDetector(
-                        child: buildIconButton(AppColors.primaryColor),
-                        onTap: () => print('change your photo'),
-                      ),
+                          child: buildIconButton(AppColors.primaryColor),
+                          onTap: () {
+                            showModalBottomSheet(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
+                                ),
+                                context: context,
+                                builder: (context) {
+                                  return buildBottomSheet(context);
+                                });
+                          }),
                     ),
                   ],
                 ),
                 buildEditInfo(),
+                buildProfileBody()
               ],
             ),
           );
@@ -92,6 +117,106 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  Container buildBottomSheet(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        children: [
+          Text(
+            'Change Your Profile Photo',
+            style: TextStyle(
+                color: AppColors.textColor3,
+                fontSize: 18,
+                fontStyle: FontStyle.normal,
+                fontWeight: FontWeight.w400),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                onPressed: ()=>takePhoto(ImageSource.camera),
+                icon: Icon(
+                  Icons.camera_alt,
+                  size: 30,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              IconButton(
+                onPressed: ()=>takePhoto(ImageSource.gallery),
+                icon: Icon(
+                  Icons.photo,
+                  size: 35,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(
+                  Icons.cancel,
+                  size: 35,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildProfileBody() {
+    return Center(
+      child: Column(
+        children: [
+          SizedBox(height: 32),
+          SizedBox(
+            height: 45,
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: ElevatedButton.icon(
+              style: ButtonStyle(
+                // elevation: MaterialStateProperty.all<double>(0.0),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(AppColors.primaryColor),
+              ),
+              icon: Icon(
+                Icons.done,
+                color: Colors.green,
+              ),
+              onPressed: () => print('profile Update'),
+              label: Text(
+                'Update',
+                style: TextStyle(color: AppColors.textColor1),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          SizedBox(
+            height: 45,
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  // elevation: MaterialStateProperty.all<double>(0.0),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(AppColors.primaryColor),
+                ),
+                onPressed: () {},
+                icon: Icon(
+                  Icons.logout,
+                  color: Colors.red,
+                ),
+                label: Text(
+                  'logout',
+                  style: TextStyle(color: Colors.red),
+                )),
+          )
+        ],
+      ),
+    );
+  }
+
   Padding buildUserInfo(User user) {
     return Padding(
       padding: EdgeInsets.only(top: 16, left: 16),
@@ -104,16 +229,16 @@ class _ProfileState extends State<Profile> {
             giveHintText: '',
           ),
           BuildTextField(
-            readOnly:false,
+            readOnly: false,
             nameController: emailController,
             textName: 'Email',
             giveHintText: '',
           ),
           BuildTextField(
-            nameController: phoneController,
-            textName: 'Phone',
-            giveHintText: '', readOnly: false
-          ),
+              nameController: phoneController,
+              textName: 'Phone',
+              giveHintText: '',
+              readOnly: false),
           BuildTextField(
             readOnly: false,
             nameController: bioController,
@@ -159,14 +284,13 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: buildProfile()
-    );
+        body: ListView(
+      children: [
+        buildProfile(),
+      ],
+    ));
   }
 }
-
