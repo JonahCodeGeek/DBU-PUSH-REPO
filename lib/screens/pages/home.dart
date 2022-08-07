@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
+import 'package:dbu_push/screens/pages/create_channels.dart';
 import 'package:dbu_push/screens/pages/profile.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
@@ -8,6 +10,8 @@ import 'package:dbu_push/widgets/circle_button.dart';
 import 'package:dbu_push/widgets/progress.dart';
 import 'package:dbu_push/widgets/user_list_tile.dart';
 import 'package:flutter/material.dart';
+
+User? currentUser;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -19,7 +23,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   tapProfile() {
     Navigator.push(
-        context, MaterialPageRoute(builder: ((context) => Profile())));
+      context,
+      MaterialPageRoute(
+        builder: ((context) => Profile(
+              profileId: currentUser?.id,
+            )),
+      ),
+    );
   }
 
   @override
@@ -28,22 +38,44 @@ class _HomeState extends State<Home> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: Colors.transparent,
+            // backgroundColor: Colors.black,
+            elevation: 0,
             floating: true,
             leading: CircleButton(
-                icon: Icons.search,
-                iconSize: 30,
-                onPressed: () {
-                  showSearch(context: context, delegate: ContentSearch());
-                }),
+              icon: Icons.search_rounded,
+              iconSize: 35,
+              onPressed: () {
+                showSearch(context: context, delegate: ContentSearch());
+              },
+            ),
+
             actions: [
-              CircleButton(
-                  icon: Icons.account_circle,
-                  iconSize: 30,
-                  onPressed: tapProfile)
+              Container(
+                margin: EdgeInsets.fromLTRB(0.0, 12.0, 12, 0),
+                child: GestureDetector(
+                  onTap: tapProfile,
+                  child: CircleAvatar(
+                    radius: 17.5,
+                    backgroundColor: Colors.grey,
+                    backgroundImage:
+                        CachedNetworkImageProvider(currentUser?.avatar ?? ''),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primaryColor,
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => CreateChannels()),
+          ),
+        ),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -73,50 +105,33 @@ class ContentSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-      future: usersDoc.where('fullName', isGreaterThanOrEqualTo: query).get(),
-      builder: ((context, snapshot) {
-        if (!snapshot.hasData) {
-          return circularProgress();
-        }
-        if (query == '') {
-          return BuildNoContent();
-        }
-
-        List<UserResult> searchSnapshots = [];
-        snapshot.data?.docs.map((doc) {
-          User user = User.fromDocument(doc);
-          UserResult results = UserResult(user);
-          searchSnapshots.add(results);
-        }).toList();
-        return ListView(
-          children: searchSnapshots,
-        );
-      }),
-    );
+    return buildStream();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-      future: usersDoc.where('fullName', isGreaterThanOrEqualTo: query).get(),
-      builder: ((context, snapshot) {
+    return buildStream();
+  }
+
+  StreamBuilder<QuerySnapshot<Object?>> buildStream() {
+    return StreamBuilder<QuerySnapshot>(
+      stream:
+          usersDoc.where('fullName', isGreaterThanOrEqualTo: query).snapshots(),
+      builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
           return circularProgress();
         }
-
-        List<UserResult> searchSnapshots = [];
-
-        if (query == '') {
+        if (query.isEmpty) {
           return BuildNoContent();
         }
+        List<UserResult> searchList = [];
         snapshot.data?.docs.map((doc) {
           User user = User.fromDocument(doc);
           UserResult results = UserResult(user);
-          searchSnapshots.add(results);
+          searchList.add(results);
         }).toList();
         return ListView(
-          children: searchSnapshots,
+          children: searchList,
         );
       }),
     );

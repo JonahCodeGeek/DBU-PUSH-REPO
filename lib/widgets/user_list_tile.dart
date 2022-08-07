@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dbu_push/models/user.dart';
+import 'package:dbu_push/screens/pages/profile.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,14 @@ class UserResult extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: ((context) => Profile(profileId: user.id)),
+                ),
+              );
+            },
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.grey,
