@@ -1,5 +1,6 @@
 import 'package:dbu_push/screens/Dashboards/home.dart';
 import 'package:dbu_push/screens/main_screen.dart';
+import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/services/auth_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +21,11 @@ class HandelAuthentication extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return HomePage();
+                  return Home();
                 },
               ),
             );
-            return HomePage();
+            return Home();
           } else {
             //instead of the auth pages i am return the OnBoardingScreen.
             return OnboardingScreen();
