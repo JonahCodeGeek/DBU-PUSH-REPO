@@ -1,4 +1,4 @@
-import 'package:dbu_push/screens/main_screen.dart';
+import 'package:dbu_push/services/route_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'utils/Theme/app_theme.dart';
@@ -6,7 +6,7 @@ import 'utils/Theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const DbuPush());
+  runApp(DbuPush());
 }
 
 class DbuPush extends StatelessWidget {
@@ -19,7 +19,7 @@ class DbuPush extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'DBU PUSH ',
       theme: appLightTheme(),
-      home: MainPage(),
+      home: HandelAuthentication(),
     );
   }
 }

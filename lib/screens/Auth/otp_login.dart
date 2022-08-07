@@ -11,18 +11,18 @@ import '../../services/auth_methods.dart';
 import '../../utils/Theme/app_colors.dart';
 import '../../widgets/app_button.dart';
 
-class OtpPrompt extends StatefulWidget {
+class LoginOtpPrompt extends StatefulWidget {
   final String phoneNumber;
   final String verificationId;
-  const OtpPrompt(
+  const LoginOtpPrompt(
       {Key? key, required this.verificationId, required this.phoneNumber})
       : super(key: key);
 
   @override
-  State<OtpPrompt> createState() => _OtpPromptState();
+  State<LoginOtpPrompt> createState() => _LoginOtpPromptState();
 }
 
-class _OtpPromptState extends State<OtpPrompt> {
+class _LoginOtpPromptState extends State<LoginOtpPrompt> {
   final otpController1 = TextEditingController();
   final otpController2 = TextEditingController();
   final otpController3 = TextEditingController();
@@ -46,8 +46,8 @@ class _OtpPromptState extends State<OtpPrompt> {
       //this is where we will update the informations.
 
       await _auth.signInWithCredential(credential).then((value) async {
-        return await AuthenticationService(FirebaseAuth.instance, context)
-            .updateInfoCase2(widget.phoneNumber);
+        return showSnackBar(
+            context, 'Successfully logged in with phone', Colors.green);
       });
     } on FirebaseException catch (e) {
       switch (e.code) {

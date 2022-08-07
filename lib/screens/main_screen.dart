@@ -4,19 +4,18 @@ import 'package:dbu_push/screens/welcome%20screen/welcome_1.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/custom_functions.dart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'welcome screen/welcome_2.dart';
 import 'welcome screen/welcome_3.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({Key? key}) : super(key: key);
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<OnboardingScreen> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<OnboardingScreen> {
   final List screens = [
     WelcomeScreenOne(),
     WelcomeScreenTwo(),
@@ -46,13 +45,10 @@ class _MainPageState extends State<MainPage> {
           children: [
             //This is for display onboarding screens
             Container(
-              width: double.maxFinite,
-              height: double.maxFinite,
               child: screens[sliderIndex],
             ),
 
             //This is for the indicators
-
             Container(
               margin: EdgeInsets.only(top: 150),
               alignment: Alignment.topRight,

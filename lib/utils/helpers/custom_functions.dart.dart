@@ -1,7 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, unused_element
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 //horizontal spacer

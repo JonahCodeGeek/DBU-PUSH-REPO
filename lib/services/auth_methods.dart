@@ -1,12 +1,14 @@
 // ignore_for_file: use_build_context_synchronously, avoid_function_literals_in_foreach_calls
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dbu_push/screens/Auth/forgot_pwd_screen.dart';
-import 'package:dbu_push/screens/Auth/otp.dart';
+import 'package:dbu_push/screens/Auth/otp_login.dart';
+import 'package:dbu_push/screens/Auth/otp_registration.dart';
+import 'package:dbu_push/screens/Dashboards/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../screens/Auth/registration_screen.dart';
+import '../screens/Dashboards/other_dashbord.dart';
+import '../screens/Dashboards/student_dashbord.dart';
 import '../utils/helpers/custom_functions.dart.dart';
 
 class AuthenticationService {
@@ -40,7 +42,7 @@ class AuthenticationService {
     );
   }
 
-  Future<void> updateInfoCase1(String email) async {
+  Future<void> updateInfoCase(String email) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final user = FirebaseAuth.instance.currentUser!;
     await database
@@ -118,7 +120,7 @@ class AuthenticationService {
             email: email,
             password: password1,
           );
-          return updateInfoCase1(email);
+          return updateInfoCase(email);
 
           //Activate the user data
 
@@ -147,7 +149,7 @@ class AuthenticationService {
     }
   }
 
-  Future<void> getOtp(String phoneNumber) async {
+  Future<void> getOtp1(String phoneNumber) async {
     await firebaseUser.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
@@ -163,7 +165,33 @@ class AuthenticationService {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return OtpPrompt(
+              return RegistrationOtpPrompt(
+                  phoneNumber: phoneNumber, verificationId: _verificationId);
+            },
+          ),
+        );
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  Future<void> getOtp2(String phoneNumber) async {
+    await firebaseUser.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // ignore: unrelated_type_equality_checks
+        return await _auth.signInWithCredential(credential).then((value) {});
+      },
+      verificationFailed: (e) {
+        showAlertDialog(context, e.message.toString(), Colors.red, true);
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        _verificationId = verificationId;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return LoginOtpPrompt(
                   phoneNumber: phoneNumber, verificationId: _verificationId);
             },
           ),
@@ -178,19 +206,130 @@ class AuthenticationService {
     required String phoneNumber,
   }) async {
     //does phone number exists?
-    final query = database
+    final query1 =
+        database.collection('users').where('phone', isEqualTo: phoneNumber);
+    final query2 = database
         .collection('users')
         .where('phone', isEqualTo: phoneNumber)
         .where('isActive', isEqualTo: false);
     //getting the document
-    final result = await query.get();
-    final userIsValid = result.docs;
+    final result1 = await query1.get();
+    final result2 = await query2.get();
+    final userIsValid = result1.docs;
+    final userIsActive = result2.docs;
     if (userIsValid.isNotEmpty) {
-      return getOtp(phoneNumber);
+      if (userIsActive.isNotEmpty) {
+        return getOtp1(phoneNumber);
+      }
+      return showAlertDialog(
+          context, 'Account is already active', Colors.red, true);
     }
     return showAlertDialog(context, 'user does not exist', Colors.red, true);
 
     //is the account with the specified info active?
     //send the otp and update the info to the registration screen
+  }
+
+  withPhoneNumberLogin({
+    required BuildContext context,
+    required String phoneNumber,
+  }) async {
+    //does phone number exists?
+    final query1 =
+        database.collection('users').where('phone', isEqualTo: phoneNumber);
+    final query2 = database
+        .collection('users')
+        .where('phone', isEqualTo: phoneNumber)
+        .where('isActive', isEqualTo: true);
+    //getting the document
+    final result1 = await query1.get();
+    final result2 = await query2.get();
+    final userIsValid = result1.docs;
+    final userIsActive = result2.docs;
+    if (userIsValid.isNotEmpty) {
+      if (userIsActive.isNotEmpty) {
+        return getOtp2(phoneNumber);
+      }
+      return showAlertDialog(
+          context,
+          'This account is not active yet. Please Register first in order to activate it.',
+          Colors.red,
+          true);
+    }
+    return showAlertDialog(
+        context,
+        'There is no user registered with phone number $phoneNumber',
+        Colors.red,
+        true);
+
+    //is the account with the specified info active?
+    //send the otp and update the info to the registration screen
+  }
+
+  Future<void> loginWithEmailAndPassword(String email, String password) async {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      return showSnackBar(context, 'logged in Successfully', Colors.green);
+    } on FirebaseAuthException catch (e) {
+      return showSnackBar(context, e.message, Colors.red);
+    }
+  }
+
+  authorize(String userID) {
+    final query1 = database
+        .collection('users')
+        .where('id', isEqualTo: userID)
+        .where('isActive', isEqualTo: true)
+        .where('role', isEqualTo: 'student');
+    final query2 = database
+        .collection('users')
+        .where('id', isEqualTo: userID)
+        .where('isActive', isEqualTo: true)
+        .where('role', isEqualTo: 'teacher');
+    final query3 = database
+        .collection('users')
+        .where('id', isEqualTo: userID)
+        .where('isActive', isEqualTo: true)
+        .where('role', isEqualTo: 'other');
+    //getting the above query results
+    query1.get().then((value) async {
+      if (value.docs.isNotEmpty) {
+        return Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Student();
+            },
+          ),
+        );
+      }
+    });
+    query2.get().then((value) async {
+      if (value.docs.isNotEmpty) {
+        return Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Teacher();
+            },
+          ),
+        );
+      }
+    });
+    query3.get().then((value) async {
+      if (value.docs.isNotEmpty) {
+        return Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Other();
+            },
+          ),
+        );
+      }
+    });
+
+    //do access control
   }
 }

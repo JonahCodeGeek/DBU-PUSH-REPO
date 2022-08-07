@@ -1,18 +1,20 @@
 import 'package:dbu_push/Animation/%20FadeAnimation.dart';
 import 'package:dbu_push/screens/Auth/forgot_pwd_screen.dart';
 import 'package:dbu_push/screens/Auth/registration_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../services/auth_methods.dart';
 import '../../utils/Theme/app_colors.dart';
 import '../../utils/helpers/custom_functions.dart.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -62,6 +64,20 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  loginWithEmailAndPassword() async {
+    await AuthenticationService(FirebaseAuth.instance, context)
+        .loginWithEmailAndPassword(
+      emailController.text.trim(),
+      passwordController.text.trim(),
+    );
+  }
+
+  loginWithPhoneNumber() async {
+    await AuthenticationService(FirebaseAuth.instance, context)
+        .withPhoneNumberLogin(
+            context: context, phoneNumber: phoneController.text.trim());
+  }
+
   @override
   void initState() {
     super.initState();
@@ -89,12 +105,14 @@ class _LoginScreenState extends State<LoginScreen> {
               color: AppColors.primaryColor,
             ),
             AppTextField(
+              controller: emailController,
               hint: 'Enter Your Email Address',
               keyboard: TextInputType.emailAddress,
               leftIcon: Icon(Icons.email_outlined),
             ),
             VerticalSpacer(20),
             AppTextField(
+              controller: passwordController,
               hint: 'Enter your Password',
               keyboard: TextInputType.text,
               hideText: true,
@@ -121,7 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             VerticalSpacer(2),
             AppButton(
-              onPressed: () {},
+              onPressed: () {
+                loginWithEmailAndPassword();
+              },
               text: 'Login',
               width: 340,
               height: 55,
@@ -184,145 +204,42 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           child: Column(
                             children: [
-                              Visibility(
-                                maintainState: true,
-                                visible: isPhoneVisible,
-                                //phone prompt section
-                                child: Column(
-                                  children: [
-                                    VerticalSpacer(30),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20.0),
-                                      child: Text(
-                                        textAlign: TextAlign.center,
-                                        'We will send you a verification code to ${phoneController.text.trim()}',
-                                        style: GoogleFonts.roboto(
-                                          color: AppColors.primaryColor,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ),
-                                    VerticalSpacer(30),
-                                    AppTextField(
-                                      controller: phoneController,
-                                      leftIcon: Icon(Icons.phone),
-                                      hint: 'Enter your phone number (+251)',
-                                      keyboard: TextInputType.phone,
-                                      action: TextInputAction.done,
-                                    ),
-                                    VerticalSpacer(30),
-                                    AppButton(
-                                      onPressed: () {
-                                        setState(() async {
-                                          isPhoneVisible = false;
-                                          isOtpVisible = true;
-                                        });
-                                      },
-                                      text: 'Get code',
-                                      width: 340,
-                                      height: 60,
-                                      buttonColor: AppColors.primaryColor,
-                                      fontColor: AppColors.textColor4,
-                                      fontSize: 20,
-                                      buttonShape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(9)),
-                                    ),
-                                    VerticalSpacer(30),
-                                  ],
+                              VerticalSpacer(30),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  'We will send you a verification code to ${phoneController.text.trim()}',
+                                  style: GoogleFonts.roboto(
+                                    color: AppColors.primaryColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
-                              //Otp verification section
-                              Visibility(
-                                visible: isOtpVisible,
-                                child: Column(
-                                  children: [
-                                    VerticalSpacer(30),
-                                    Text(
-                                      textAlign: TextAlign.center,
-                                      'Enter the code sent to ${phoneController.text.trim()}',
-                                      style: GoogleFonts.roboto(
-                                        color: AppColors.primaryColor,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                    VerticalSpacer(30),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Row(
-                                          children: List.generate(
-                                            otp.length,
-                                            (inputIndex) {
-                                              return Container(
-                                                margin: EdgeInsets.all(4),
-                                                width: 50,
-                                                height: 50,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  border: Border.all(
-                                                      color: Colors.deepPurple),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                child: TextField(
-                                                  controller: otp[inputIndex],
-                                                  autofocus: true,
-                                                  onChanged: (value) {
-                                                    if (value.length == 1) {
-                                                      FocusScope.of(context)
-                                                          .nextFocus();
-                                                    }
-                                                  },
-                                                  inputFormatters: [
-                                                    LengthLimitingTextInputFormatter(
-                                                        1),
-                                                  ],
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      TextStyle(fontSize: 20),
-                                                  decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    VerticalSpacer(30),
-                                    AppButton(
-                                      onPressed: () {},
-                                      text: 'Verify code',
-                                      width: 340,
-                                      height: 60,
-                                      buttonColor: AppColors.primaryColor,
-                                      fontColor: AppColors.textColor4,
-                                      fontSize: 20,
-                                      buttonShape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(9),
-                                      ),
-                                    ),
-
-                                    // Text(
-                                    //   otp[0].text.trim() +
-                                    //       otp[1].text.trim() +
-                                    //       otp[2].text.trim() +
-                                    //       otp[3].text.trim() +
-                                    //       otp[4].text.trim() +
-                                    //       otp[5].text.trim(),
-                                    // )
-                                  ],
-                                ),
+                              VerticalSpacer(30),
+                              AppTextField(
+                                controller: phoneController,
+                                leftIcon: Icon(Icons.phone),
+                                hint: 'Enter your phone number (+251)',
+                                keyboard: TextInputType.phone,
+                                action: TextInputAction.done,
                               ),
+                              VerticalSpacer(30),
+                              AppButton(
+                                onPressed: () {
+                                  loginWithPhoneNumber();
+                                },
+                                text: 'Get code',
+                                width: 340,
+                                height: 60,
+                                buttonColor: AppColors.primaryColor,
+                                fontColor: AppColors.textColor4,
+                                fontSize: 20,
+                                buttonShape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9)),
+                              ),
+                              VerticalSpacer(30),
                             ],
                           ),
                         ),
