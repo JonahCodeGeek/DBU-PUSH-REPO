@@ -12,6 +12,7 @@ import 'package:dbu_push/widgets/user_list_tile.dart';
 import 'package:flutter/material.dart';
 
 User? currentUser;
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -20,7 +21,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  
   tapProfile() {
     Navigator.push(
       context,

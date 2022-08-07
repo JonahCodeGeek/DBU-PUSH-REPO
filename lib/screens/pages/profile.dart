@@ -7,10 +7,13 @@ import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/build_text_field.dart';
+import 'package:dbu_push/widgets/buttons.dart';
 import 'package:dbu_push/widgets/progress.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key, required this.profileId}) : super(key: key);
@@ -26,9 +29,11 @@ class _ProfileState extends State<Profile> {
   TextEditingController idController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  bool isProfileOwner = true;
-  File? file;
+  bool isProfileOwner = false;
   final ImagePicker _picker = ImagePicker();
+  File? file;
+  bool isFile = false;
+  String profileId = Uuid().v4();
   @override
   void initState() {
     super.initState();
@@ -38,11 +43,31 @@ class _ProfileState extends State<Profile> {
   }
 
   takePhoto(ImageSource source) async {
-    XFile? file = await _picker.pickImage(
-      source: source,
-    );
+    Navigator.pop(context);
+    XFile? file =
+        await _picker.pickImage(source: source, maxHeight: 675, maxWidth: 960);
     setState(() {
       this.file = File(file!.path);
+    });
+  }
+
+  Future<String> uploadImage(File imagefile) async {
+    UploadTask uploadTask =
+        storage.child('profile_$profileId.jpg').putFile(imagefile);
+    String imageUrl = await (await uploadTask).ref.getDownloadURL();
+    return imageUrl;
+  }
+
+  handleUpdate() async {
+    String imageUrl = await uploadImage(file!);
+    usersDoc.doc('O6DlpswReyWvbFnjUbHA').update({
+      'fullName': nameController.text,
+      'bio': bioController.text,
+      'avatar': imageUrl
+    });
+    setState(() {
+      file = null;
+      profileId = Uuid().v4();
     });
   }
 
@@ -60,6 +85,7 @@ class _ProfileState extends State<Profile> {
         phoneController.text = user.phone!;
         emailController.text = user.email!;
         if (isProfileOwner) {
+          isFile = file != null;
           return Padding(
             padding: EdgeInsets.only(top: 60),
             child: Column(
@@ -69,30 +95,52 @@ class _ProfileState extends State<Profile> {
                     CircleAvatar(
                       radius: 64,
                       backgroundColor: Colors.grey,
-                      backgroundImage: CachedNetworkImageProvider(user.avatar!),
+                      child: isFile
+                          ? Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: FileImage(
+                                    File(file!.path),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: CachedNetworkImageProvider(
+                                        user.avatar!),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
                     ),
                     Positioned(
                       bottom: 0,
                       right: 4,
                       child: GestureDetector(
-                          child: buildIconButton(AppColors.primaryColor),
-                          onTap: () {
-                            showModalBottomSheet(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(16),
-                                  ),
-                                ),
-                                context: context,
-                                builder: (context) {
-                                  return buildBottomSheet(context);
-                                });
-                          }),
+                        child: buildIconButton(AppColors.primaryColor),
+                        onTap: () {
+                          showModalBottomSheet(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            context: context,
+                            builder: (context) {
+                              return buildBottomSheet(context);
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
                 buildEditInfo(),
-                buildProfileBody()
+                buildProfileBody(handleUpdate)
               ],
             ),
           );
@@ -104,8 +152,7 @@ class _ProfileState extends State<Profile> {
                 CircleAvatar(
                   radius: 64,
                   backgroundColor: Colors.grey,
-                  backgroundImage:
-                      CachedNetworkImageProvider(user.avatar ?? ''),
+                  backgroundImage: CachedNetworkImageProvider(user.avatar!),
                 ),
                 buildUserInfo(user),
               ],
@@ -135,7 +182,7 @@ class _ProfileState extends State<Profile> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                onPressed: ()=>takePhoto(ImageSource.camera),
+                onPressed: () => takePhoto(ImageSource.camera),
                 icon: Icon(
                   Icons.camera_alt,
                   size: 30,
@@ -143,7 +190,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               IconButton(
-                onPressed: ()=>takePhoto(ImageSource.gallery),
+                onPressed: () => takePhoto(ImageSource.gallery),
                 icon: Icon(
                   Icons.photo,
                   size: 35,
@@ -151,7 +198,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               IconButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.pop(context),
                 icon: Icon(
                   Icons.cancel,
                   size: 35,
@@ -160,58 +207,6 @@ class _ProfileState extends State<Profile> {
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildProfileBody() {
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(height: 32),
-          SizedBox(
-            height: 45,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: ElevatedButton.icon(
-              style: ButtonStyle(
-                // elevation: MaterialStateProperty.all<double>(0.0),
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(AppColors.primaryColor),
-              ),
-              icon: Icon(
-                Icons.done,
-                color: Colors.green,
-              ),
-              onPressed: () => print('profile Update'),
-              label: Text(
-                'Update',
-                style: TextStyle(color: AppColors.textColor1),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-          SizedBox(
-            height: 45,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: ElevatedButton.icon(
-                style: ButtonStyle(
-                  // elevation: MaterialStateProperty.all<double>(0.0),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(AppColors.primaryColor),
-                ),
-                onPressed: () {},
-                icon: Icon(
-                  Icons.logout,
-                  color: Colors.red,
-                ),
-                label: Text(
-                  'logout',
-                  style: TextStyle(color: Colors.red),
-                )),
-          )
         ],
       ),
     );
