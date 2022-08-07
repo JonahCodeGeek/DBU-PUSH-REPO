@@ -14,16 +14,16 @@ class User {
   final bool? isActive;
 
   User({
-     this.id,
-     this.fullName,
-     this.email,
-     this.phone,
-     this.uId,
-     this.role,
-     this.channelId,
-     this.avatar,
-     this.bio,
-     this.isActive,
+    this.id,
+    this.fullName,
+    this.email,
+    this.phone,
+    this.uId,
+    this.role,
+    this.channelId,
+    this.avatar,
+    this.bio,
+    this.isActive,
   });
   factory User.fromDocument(DocumentSnapshot doc) {
     return User(
