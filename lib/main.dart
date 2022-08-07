@@ -19,11 +19,7 @@ class DbuPush extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'DBU PUSH ',
       theme: appLightTheme(),
-<<<<<<< HEAD
       home: HandelAuthentication(),
-=======
-      home:MainPage(),
->>>>>>> b748a7dd281c4f94f1b6c8385c9f86f49d15e018
     );
   }
 }
