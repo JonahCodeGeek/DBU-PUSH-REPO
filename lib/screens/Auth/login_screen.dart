@@ -82,11 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     addNo();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.scaffoldColor,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
-    ));
   }
 
   @override
@@ -267,10 +262,11 @@ class _LoginScreenState extends State<LoginScreen> {
               alignment: Alignment.bottomCenter,
               child: AppButton(
                 onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) {
-                    return RegistrationScreen();
-                  }));
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return RegistrationScreen();
+                    },
+                  ));
                 },
                 text: "Don't have an account ? Register",
                 width: double.maxFinite,

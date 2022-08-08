@@ -26,10 +26,9 @@ class _MainPageState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.scaffoldColor,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.light,
-    ));
+        statusBarColor: AppColors.scaffoldColor,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.dark));
   }
 
   //stream builder will be returned here.

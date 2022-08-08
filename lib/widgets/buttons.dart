@@ -1,5 +1,8 @@
 import 'package:dbu_push/utils/Theme/app_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../services/auth_methods.dart';
 
 class ElevatedButtons extends StatefulWidget {
   const ElevatedButtons(
@@ -28,7 +31,9 @@ class _ElevatedButtonsState extends State<ElevatedButtons> {
           Icons.done,
           color: widget.color,
         ),
-        onPressed: widget.function,
+        onPressed: () {
+          AuthenticationService(FirebaseAuth.instance, context).signOut();
+        },
         label: Text(
           widget.label,
           style: TextStyle(color: AppColors.textColor1),
@@ -37,34 +42,34 @@ class _ElevatedButtonsState extends State<ElevatedButtons> {
     );
   }
 }
- Widget buildProfileBody(Function() handleUpdate) {
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(height: 32),
-          ElevatedButtons(
-            label: 'Update Profile',
-            function: handleUpdate,
-            color: Colors.green,
-          ),
-          SizedBox(
-            height: 30,
-            child: Text(
-              'Or',
-              style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 24,
-                  color: Colors.grey,
-                  fontStyle: FontStyle.italic),
-            ),
-          ),
-          ElevatedButtons(
-            label: 'logout',
-            function: () {},
-            color: Colors.red,
-          ),
-        ],
-      ),
-    );
-  }
 
+Widget buildProfileBody(Function() handleUpdate) {
+  return Center(
+    child: Column(
+      children: [
+        SizedBox(height: 32),
+        ElevatedButtons(
+          label: 'Update Profile',
+          function: handleUpdate,
+          color: Colors.green,
+        ),
+        SizedBox(
+          height: 30,
+          child: Text(
+            'Or',
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 24,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic),
+          ),
+        ),
+        ElevatedButtons(
+          label: 'logout',
+          function: () {},
+          color: Colors.red,
+        ),
+      ],
+    ),
+  );
+}
