@@ -1,6 +1,4 @@
-import 'package:dbu_push/screens/Dashboards/home.dart';
 import 'package:dbu_push/screens/main_screen.dart';
-import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/screens/pages/page_navigator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables
+
 import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/screens/pages/notfications.dart';
 import 'package:dbu_push/screens/pages/private_channel.dart';
@@ -66,7 +68,7 @@ class _PageNavigatorState extends State<PageNavigator> {
         currentIndex: pageIndex,
         activeColor: AppColors.primaryColor,
         // height: 60,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(
               Icons.notifications,

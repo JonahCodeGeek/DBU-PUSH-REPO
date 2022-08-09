@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
@@ -22,6 +24,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final database = FirebaseFirestore.instance;
+
+  bool isVisible = false;
   tapProfile() {
     Navigator.push(
       context,
@@ -33,14 +38,29 @@ class _HomeState extends State<Home> {
     );
   }
 
+  authorize() async {
+    final query1 = database
+        .collection('users')
+        .where('id', isEqualTo: currentUser?.id)
+        .where('role', isEqualTo: 'student')
+        .limit(1);
+    final result = await query1.get();
+    final isStudent = result.docs;
+    if (isStudent.isNotEmpty) {
+      setState(() {
+        isVisible == isVisible;
+      });
+    } else {
+      setState(() {
+        isVisible = !isVisible;
+      });
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    return SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: AppColors.scaffoldColor,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.dark));
+    authorize();
   }
 
   @override
@@ -71,8 +91,8 @@ class _HomeState extends State<Home> {
                     child: CircleAvatar(
                       radius: 17.5,
                       backgroundColor: Colors.grey,
-                      backgroundImage:
-                          CachedNetworkImageProvider(currentUser?.avatar ?? ''),
+                      backgroundImage: CachedNetworkImageProvider(
+                          currentUser?.avatar ?? 'ss'),
                     ),
                   ),
                 ),
@@ -81,15 +101,18 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primaryColor,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: ((context) => CreateChannels()),
+      floatingActionButton: Visibility(
+        visible: isVisible,
+        child: FloatingActionButton(
+          backgroundColor: AppColors.primaryColor,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: ((context) => CreateChannels()),
+            ),
           ),
+          child: Icon(Icons.add),
         ),
-        child: Icon(Icons.add),
       ),
     );
   }
