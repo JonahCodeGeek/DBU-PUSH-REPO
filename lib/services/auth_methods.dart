@@ -54,10 +54,12 @@ class AuthenticationService {
           (QuerySnapshot snapshot) => {
             snapshot.docs.forEach((document) async {
               user.sendEmailVerification();
+
               await FirebaseFirestore.instance
                   .collection('users')
                   .doc(document.id)
                   .update({'isActive': true, 'id': uid});
+              Navigator.of(context).pop();
               return showSnackBar(
                   context,
                   'successfully registered. Please check your email and verify your account !',
@@ -82,8 +84,9 @@ class AuthenticationService {
                     .collection('users')
                     .doc(documents.id)
                     .update({'isActive': true, 'id': uid});
-                return showSnackBar(
-                    context, 'successfully registered', Colors.green);
+
+                showSnackBar(context, 'successfully registered', Colors.green);
+                Navigator.of(context).pop();
               })
             });
   }
@@ -161,8 +164,8 @@ class AuthenticationService {
       },
       codeSent: (String verificationId, int? resendToken) {
         _verificationId = verificationId;
-        Navigator.pushReplacement(
-          context,
+        Navigator.pop(context);
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) {
               return RegistrationOtpPrompt(
@@ -270,7 +273,9 @@ class AuthenticationService {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      return showSnackBar(context, 'logged in Successfully', Colors.green);
+
+      showSnackBar(context, 'logged in Successfully', Colors.green);
+      Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       return showSnackBar(context, e.message, Colors.red);
     }
@@ -329,7 +334,11 @@ class AuthenticationService {
         );
       }
     });
-
     //do access control
+  }
+
+  Future<void> signOut() async {
+    Navigator.of(context).pop();
+    return await firebaseUser.signOut();
   }
 }

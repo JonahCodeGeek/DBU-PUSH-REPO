@@ -1,11 +1,14 @@
-
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/auth_methods.dart';
+
 class ElevatedButtons extends StatefulWidget {
-  const ElevatedButtons(
-      {required this.label, required this.function,});
+  const ElevatedButtons({
+    required this.label,
+    required this.function,
+  });
   final String label;
   final Function() function;
 
@@ -17,21 +20,23 @@ class _ElevatedButtonsState extends State<ElevatedButtons> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 45,
-        width: MediaQuery.of(context).size.width * 0.9,
-        child: ElevatedButton(
-          onPressed: widget.function,
-          style: ButtonStyle(
-            elevation: MaterialStateProperty.all<double>(0.0),
-            backgroundColor:
-                MaterialStateProperty.all<Color>(AppColors.primaryColor),
-          ),
-          child: Text(
-            widget.label,
-            style: TextStyle(color: AppColors.textColor1),
-          ),
-        )
-        );
+      height: 45,
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          elevation: MaterialStateProperty.all<double>(0.0),
+          backgroundColor:
+              MaterialStateProperty.all<Color>(AppColors.primaryColor),
+        ),
+        onPressed: () {
+          AuthenticationService(FirebaseAuth.instance, context).signOut();
+        },
+        child: Text(
+          widget.label,
+          style: TextStyle(color: AppColors.textColor1),
+        ),
+      ),
+    );
   }
 }
 

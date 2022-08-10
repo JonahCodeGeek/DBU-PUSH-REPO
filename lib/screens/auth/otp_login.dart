@@ -43,8 +43,11 @@ class _LoginOtpPromptState extends State<LoginOtpPrompt> {
       );
       //this is where we will update the informations.
 
-      await _auth.signInWithCredential(credential).then((value) async {
-        return showSnackBar(
+      return await _auth.signInWithCredential(credential).then((value) async {
+        Navigator.pop(context);
+        Navigator.pop(context);
+
+        showSnackBar(
             context, 'Successfully logged in with phone', Colors.green);
       });
     } on FirebaseException catch (e) {

@@ -3,7 +3,6 @@ import 'package:dbu_push/screens/auth/forgot_pwd_screen.dart';
 import 'package:dbu_push/screens/auth/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -83,11 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     addNo();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.scaffoldColor,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
-    ));
   }
 
   @override
@@ -268,10 +262,11 @@ class _LoginScreenState extends State<LoginScreen> {
               alignment: Alignment.bottomCenter,
               child: AppButton(
                 onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) {
-                    return RegistrationScreen();
-                  }));
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return RegistrationScreen();
+                    },
+                  ));
                 },
                 text: "Don't have an account ? Register",
                 width: double.maxFinite,

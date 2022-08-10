@@ -83,11 +83,11 @@ class _OtpPromptState extends State<RegistrationOtpPrompt> {
   void initState() {
     super.initState();
     addNo();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.scaffoldColor,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
-    ));
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: AppColors.scaffoldColor,
+    //   statusBarIconBrightness: Brightness.dark,
+    //   statusBarBrightness: Brightness.light,
+    // ));
   }
 
   @override

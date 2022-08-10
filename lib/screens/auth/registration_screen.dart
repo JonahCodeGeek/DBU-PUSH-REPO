@@ -71,11 +71,6 @@ class RegistrationScreenState extends State<RegistrationScreen> {
   void initState() {
     super.initState();
     addNo();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.scaffoldColor,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
-    ));
   }
 
   registerUserWithEmail() async {
@@ -374,10 +369,11 @@ class RegistrationScreenState extends State<RegistrationScreen> {
               alignment: Alignment.bottomCenter,
               child: AppButton(
                 onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) {
-                    return LoginScreen();
-                  }));
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return LoginScreen();
+                    },
+                  ));
                 },
                 text: 'Already have an account ? Login',
                 width: double.maxFinite,

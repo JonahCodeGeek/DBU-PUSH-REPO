@@ -10,6 +10,7 @@ import 'package:dbu_push/widgets/circle_button.dart';
 import 'package:dbu_push/widgets/progress.dart';
 import 'package:dbu_push/widgets/user_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 User? currentUser;
 
@@ -33,39 +34,51 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    return SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: AppColors.scaffoldColor,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.dark));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.transparent,
-            // backgroundColor: Colors.black,
-            elevation: 0,
-            floating: true,
-            leading: CircleButton(
-              icon: Icons.search_rounded,
-              iconSize: 35,
-              onPressed: () {
-                showSearch(context: context, delegate: ContentSearch());
-              },
-            ),
+      backgroundColor: AppColors.scaffoldColor,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              backgroundColor: Colors.transparent,
+              // backgroundColor: Colors.black,
+              elevation: 0,
+              floating: true,
+              leading: CircleButton(
+                icon: Icons.search_rounded,
+                iconSize: 35,
+                onPressed: () {
+                  showSearch(context: context, delegate: ContentSearch());
+                },
+              ),
 
-            actions: [
-              Container(
-                margin: EdgeInsets.fromLTRB(0.0, 12.0, 12, 0),
-                child: GestureDetector(
-                  onTap: tapProfile,
-                  child: CircleAvatar(
-                    radius: 17.5,
-                    backgroundColor: Colors.grey,
-                    backgroundImage:
-                        CachedNetworkImageProvider(currentUser?.avatar ?? ''),
+              actions: [
+                Container(
+                  margin: EdgeInsets.fromLTRB(0.0, 12.0, 12, 0),
+                  child: GestureDetector(
+                    onTap: tapProfile,
+                    child: CircleAvatar(
+                      radius: 17.5,
+                      backgroundColor: Colors.grey,
+                      backgroundImage:
+                          CachedNetworkImageProvider(currentUser?.avatar ?? ''),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryColor,
