@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
-import 'package:dbu_push/Animation/%20FadeAnimation.dart';
-import 'package:dbu_push/screens/Auth/login_screen.dart';
+import 'package:dbu_push/animation/%20fade_animation.dart';
+import 'package:dbu_push/screens/auth/login_screen.dart';
 import 'package:dbu_push/utils/helpers/custom_functions.dart.dart';
 import 'package:dbu_push/widgets/app_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';

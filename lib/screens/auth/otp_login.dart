@@ -4,10 +4,8 @@ import 'package:dbu_push/utils/helpers/custom_functions.dart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../services/auth_methods.dart';
 import '../../utils/Theme/app_colors.dart';
 import '../../widgets/app_button.dart';
 

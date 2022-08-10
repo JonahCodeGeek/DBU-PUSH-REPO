@@ -1,14 +1,14 @@
 // ignore_for_file: use_build_context_synchronously, avoid_function_literals_in_foreach_calls
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dbu_push/screens/Auth/otp_login.dart';
-import 'package:dbu_push/screens/Auth/otp_registration.dart';
-import 'package:dbu_push/screens/Dashboards/teacher_dashboard.dart';
+import 'package:dbu_push/screens/auth/otp_login.dart';
+import 'package:dbu_push/screens/auth/otp_registration.dart';
+import 'package:dbu_push/screens/dashboards/teacher_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../screens/Dashboards/other_dashbord.dart';
-import '../screens/Dashboards/student_dashbord.dart';
+import '../screens/dashboards/other_dashbord.dart';
+import '../screens/dashboards/student_dashbord.dart';
 import '../utils/helpers/custom_functions.dart.dart';
 
 class AuthenticationService {

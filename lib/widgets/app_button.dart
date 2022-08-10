@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../screens/Auth/registration_screen.dart';
+import '../screens/auth/registration_screen.dart';
 import '../utils/Theme/app_colors.dart';
 
 class AppButton extends StatelessWidget {
