@@ -1,9 +1,5 @@
 import 'package:dbu_push/utils/Theme/app_colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../services/auth_methods.dart';
-
 class ElevatedButtons extends StatefulWidget {
   const ElevatedButtons({
     required this.label,
@@ -28,9 +24,7 @@ class _ElevatedButtonsState extends State<ElevatedButtons> {
           backgroundColor:
               MaterialStateProperty.all<Color>(AppColors.primaryColor),
         ),
-        onPressed: () {
-          AuthenticationService(FirebaseAuth.instance, context).signOut();
-        },
+        onPressed:widget.function,
         child: Text(
           widget.label,
           style: TextStyle(color: AppColors.textColor1),
@@ -40,7 +34,7 @@ class _ElevatedButtonsState extends State<ElevatedButtons> {
   }
 }
 
-Widget buildProfileBody(Function() handleUpdate) {
+Widget buildProfileBody(Function() handleUpdate,handleLogout) {
   return Center(
     child: Column(
       children: [
@@ -62,9 +56,7 @@ Widget buildProfileBody(Function() handleUpdate) {
         ),
         ElevatedButtons(
           label: 'logout',
-          function: () {
-            FirebaseAuth.instance.signOut();
-          },
+          function:handleLogout
         ),
       ],
     ),

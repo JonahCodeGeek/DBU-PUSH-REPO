@@ -59,6 +59,7 @@ class AuthenticationService {
                   .collection('users')
                   .doc(document.id)
                   .update({'isActive': true, 'id': uid});
+              //why you pop it here bro ??
               Navigator.of(context).pop();
               return showSnackBar(
                   context,
@@ -338,7 +339,6 @@ class AuthenticationService {
   }
 
   Future<void> signOut() async {
-    Navigator.of(context).pop();
     return await firebaseUser.signOut();
   }
 }
