@@ -15,61 +15,63 @@ class WelcomeScreenOne extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.scaffoldColor,
-      child: Column(
-        children: [
-          VerticalSpacer(70),
-          //Picture
-          FadeAnimation(
-            1.5,
-            SvgPicture.asset(
-              'assets/images/undraw_personal_text.svg',
-              height: 250,
-            ),
-          ),
-          //Header text
-          VerticalSpacer(170),
-          Column(
-            children: [
-              //Header text
-              FadeAnimation(
-                3,
-                OnboardingText(
-                    coloredText: 'Never ',
-                    normalText: 'Miss A Notification       ',
-                    lightText: 'with the help of instant push notifications'
-                        ' you won’t miss any information from your channel.'),
+    return SingleChildScrollView(
+      child: Container(
+        color: AppColors.scaffoldColor,
+        child: Column(
+          children: [
+            VerticalSpacer(70),
+            //Picture
+            FadeAnimation(
+              1.5,
+              SvgPicture.asset(
+                'assets/images/undraw_personal_text.svg',
+                height: 250,
               ),
-              VerticalSpacer(54),
-              Padding(
-                padding: EdgeInsets.only(right: 8.0),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context) {
-                          return RegistrationScreen();
-                        },
-                      ));
-                    },
-                    child: FadeAnimation(
-                      4,
-                      Text(
-                        'Skip >',
-                        style: GoogleFonts.roboto(
-                          color: AppColors.textColor1,
-                          fontSize: 24,
+            ),
+            //Header text
+            VerticalSpacer(170),
+            Column(
+              children: [
+                //Header text
+                FadeAnimation(
+                  3,
+                  OnboardingText(
+                      coloredText: 'Never ',
+                      normalText: 'Miss A Notification       ',
+                      lightText: 'with the help of instant push notifications'
+                          ' you won’t miss any information from your channel.'),
+                ),
+                VerticalSpacer(54),
+                Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            return RegistrationScreen();
+                          },
+                        ));
+                      },
+                      child: FadeAnimation(
+                        4,
+                        Text(
+                          'Skip >',
+                          style: GoogleFonts.roboto(
+                            color: AppColors.textColor1,
+                            fontSize: 24,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              )
-            ],
-          )
-        ],
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

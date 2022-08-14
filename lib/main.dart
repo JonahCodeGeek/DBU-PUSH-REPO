@@ -1,14 +1,18 @@
-
+import 'package:dbu_push/providers/get_current_user.dart';
 import 'package:dbu_push/services/route_handler.dart';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'utils/Theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(DbuPush());
+  runApp(ChangeNotifierProvider(
+    create: (context) => GetCurrentUser(),
+    child: DbuPush(),
+  ));
 }
 
 class DbuPush extends StatelessWidget {
@@ -25,3 +29,17 @@ class DbuPush extends StatelessWidget {
     );
   }
 }
+
+// class GetCurrentUser with ChangeNotifier {
+//   void getCurrentUser(AsyncSnapshot<User?> snapshot) {
+//     final doc = usersDoc.where('email', isEqualTo: snapshot.data?.email).get();
+//     doc.then(
+//       (snapshot) => {
+//         snapshot.docs.forEach((element) async {
+//           final currentUser = UserModel.fromDocument(element);
+//         })
+//       },
+//     );
+//     notifyListeners();
+//   }
+// }

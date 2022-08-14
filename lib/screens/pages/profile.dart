@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
-import 'package:dbu_push/screens/pages/home.dart';
+import 'package:dbu_push/providers/get_current_user.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/build_text_field.dart';
@@ -13,7 +13,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+
+UserModel? currentUser;
 
 class Profile extends StatefulWidget {
   const Profile({Key? key, required this.profileId}) : super(key: key);
@@ -23,22 +26,22 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final currentUserId = currentUser?.id;
+  String? currentUserId;
   TextEditingController nameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
   TextEditingController idController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  bool isProfileOwner = false;
   final ImagePicker _picker = ImagePicker();
   File? file;
   bool isFile = false;
-  String profileId = Uuid().v4();
+  String avatorId = Uuid().v4();
   @override
   void initState() {
     super.initState();
+    currentUser = Provider.of<GetCurrentUser>(context,listen: false).currentUser;
     setState(() {
-      isProfileOwner = false;
+      currentUserId = currentUser?.id;
     });
   }
 
@@ -53,36 +56,38 @@ class _ProfileState extends State<Profile> {
 
   Future<String> uploadImage(File imagefile) async {
     UploadTask uploadTask =
-        storage.child('profile_$profileId.jpg').putFile(imagefile);
+        storage.child('profile_$avatorId.jpg').putFile(imagefile);
     String imageUrl = await (await uploadTask).ref.getDownloadURL();
     return imageUrl;
   }
 
   handleUpdate() async {
     String imageUrl = await uploadImage(file!);
-    usersDoc.doc('O6DlpswReyWvbFnjUbHA').update({
+    usersDoc.doc(currentUserId).update({
       'fullName': nameController.text,
       'bio': bioController.text,
       'avatar': imageUrl
     });
     setState(() {
       file = null;
-      profileId = Uuid().v4();
+      avatorId = Uuid().v4();
     });
   }
 
   handleLogout() {
-  //
+    //
   }
 
   buildProfile() {
-    isProfileOwner = widget.profileId == currentUserId;
+    bool isProfileOwner = widget.profileId == currentUserId;
     return FutureBuilder<DocumentSnapshot>(
+      future: usersDoc.doc(widget.profileId).get(),
       builder: ((context, snapshot) {
         if (!snapshot.hasData) {
           return circularProgress();
         }
-        User user = User.fromDocument(snapshot.data!);
+
+        UserModel user = UserModel.fromDocument(snapshot.data!);
         nameController.text = user.fullName!;
         bioController.text = user.bio!;
         idController.text = user.uId!;
@@ -115,8 +120,8 @@ class _ProfileState extends State<Profile> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                    image: CachedNetworkImageProvider(
-                                        user.avatar!),
+                                    image:
+                                        CachedNetworkImageProvider(user.avatar),
                                     fit: BoxFit.cover),
                               ),
                             ),
@@ -156,7 +161,7 @@ class _ProfileState extends State<Profile> {
                 CircleAvatar(
                   radius: 64,
                   backgroundColor: Colors.grey,
-                  backgroundImage: CachedNetworkImageProvider(user.avatar!),
+                  backgroundImage: CachedNetworkImageProvider(user.avatar),
                 ),
                 buildUserInfo(user),
               ],
@@ -164,7 +169,6 @@ class _ProfileState extends State<Profile> {
           );
         }
       }),
-      future: usersDoc.doc('O6DlpswReyWvbFnjUbHA').get(),
     );
   }
 
@@ -216,7 +220,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Padding buildUserInfo(User user) {
+  Padding buildUserInfo(UserModel user) {
     return Padding(
       padding: EdgeInsets.only(top: 16, left: 16),
       child: Column(

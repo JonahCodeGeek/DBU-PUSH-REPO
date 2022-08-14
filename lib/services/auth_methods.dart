@@ -58,7 +58,7 @@ class AuthenticationService {
               await FirebaseFirestore.instance
                   .collection('users')
                   .doc(document.id)
-                  .update({'isActive': true, 'id': uid});
+                  .update({'isActive': true, 'id':document.id});
               //why you pop it here bro ??
               Navigator.of(context).pop();
               return showSnackBar(
@@ -84,8 +84,7 @@ class AuthenticationService {
                 await database
                     .collection('users')
                     .doc(documents.id)
-                    .update({'isActive': true, 'id': uid});
-
+                    .update({'isActive': true, 'id':documents.id});
                 showSnackBar(context, 'successfully registered', Colors.green);
                 Navigator.of(context).pop();
               })

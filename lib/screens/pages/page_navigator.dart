@@ -1,22 +1,25 @@
+import 'package:dbu_push/models/user.dart';
 import 'package:dbu_push/screens/pages/home.dart';
 import 'package:dbu_push/screens/pages/notfications.dart';
 import 'package:dbu_push/screens/pages/private_channel.dart';
 import 'package:dbu_push/screens/pages/public_channels.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
+import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// UserModel? currentUser;
 class PageNavigator extends StatefulWidget {
-  const PageNavigator({Key? key}) : super(key: key);
-
+  PageNavigator({Key? key, required this.authUser}) : super(key: key);
+  UserModel? authUser;
+  // String? authUserPhone;
   @override
   State<PageNavigator> createState() => _PageNavigatorState();
 }
 
 class _PageNavigatorState extends State<PageNavigator> {
-  int pageIndex = 1;
-
+  int pageIndex = 0;
   PageController? pageController;
 
   @override
@@ -54,9 +57,11 @@ class _PageNavigatorState extends State<PageNavigator> {
         onPageChanged: onPageChanged,
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
-        children: const [
+        children: [
           Notfications(),
-          Home(),
+          Home(
+            user: widget.authUser,
+          ),
           PrivateChannels(),
           PublicChannels(),
         ],

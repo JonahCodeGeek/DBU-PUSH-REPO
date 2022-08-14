@@ -12,22 +12,21 @@ import 'package:dbu_push/widgets/user_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-User? currentUser;
-
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
-
+  Home({Key? key, required this.user}) : super(key: key);
+  UserModel? user;
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+
   tapProfile() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: ((context) => Profile(
-              profileId: currentUser?.id,
+              profileId:widget.user?.id,
             )),
       ),
     );
@@ -71,7 +70,7 @@ class _HomeState extends State<Home> {
                       radius: 17.5,
                       backgroundColor: Colors.grey,
                       backgroundImage:
-                          CachedNetworkImageProvider(currentUser?.avatar ?? ''),
+                          CachedNetworkImageProvider(widget.user?.avatar??''),
                     ),
                   ),
                 ),
@@ -139,7 +138,7 @@ class ContentSearch extends SearchDelegate {
         }
         List<UserResult> searchList = [];
         snapshot.data?.docs.map((doc) {
-          User user = User.fromDocument(doc);
+          UserModel user = UserModel.fromDocument(doc);
           UserResult results = UserResult(user);
           searchList.add(results);
         }).toList();
