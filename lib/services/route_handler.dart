@@ -3,6 +3,8 @@ import 'package:dbu_push/screens/pages/page_navigator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/progress.dart';
+
 class HandelAuthentication extends StatelessWidget {
   const HandelAuthentication({Key? key}) : super(key: key);
 
@@ -12,6 +14,9 @@ class HandelAuthentication extends StatelessWidget {
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return circularProgress();
+          }
           if (snapshot.hasData) {
             print(snapshot.data!.uid);
             //i will create a method that will handel access control

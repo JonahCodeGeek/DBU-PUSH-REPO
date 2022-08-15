@@ -52,11 +52,12 @@ class _PageNavigatorState extends State<PageNavigator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldColor,
       body: PageView(
         onPageChanged: onPageChanged,
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
-        children: const [
+        children: [
           Notfications(),
           Home(),
           PrivateChannels(),

@@ -78,7 +78,7 @@ class _ProfileState extends State<Profile> {
         if (!snapshot.hasData) {
           return circularProgress();
         }
-        User user = User.fromDocument(snapshot.data!);
+        UserModel user = UserModel.fromDocument(snapshot.data!);
         nameController.text = user.fullName!;
         bioController.text = user.bio!;
         idController.text = user.uId!;
@@ -160,7 +160,7 @@ class _ProfileState extends State<Profile> {
           );
         }
       }),
-      future: usersDoc.doc('O6DlpswReyWvbFnjUbHA').get(),
+      future: usersDoc.doc('dKqHl88mDljwC04Ch8Xk').get(),
     );
   }
 
@@ -212,7 +212,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Padding buildUserInfo(User user) {
+  Padding buildUserInfo(UserModel user) {
     return Padding(
       padding: EdgeInsets.only(top: 16, left: 16),
       child: Column(

@@ -23,8 +23,11 @@ class _NotficationsState extends State<Notfications> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Notfications page'),
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldColor,
+      body: Center(
+        child: Text('Notfications page'),
+      ),
     );
   }
 }

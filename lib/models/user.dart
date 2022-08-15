@@ -1,7 +1,6 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class User {
+class UserModel {
   final String? id;
   final String? fullName;
   final String? email;
@@ -13,7 +12,7 @@ class User {
   final String? bio;
   final bool? isActive;
 
-  User({
+  UserModel({
     this.id,
     this.fullName,
     this.email,
@@ -25,8 +24,8 @@ class User {
     this.bio,
     this.isActive,
   });
-  factory User.fromDocument(DocumentSnapshot doc) {
-    return User(
+  factory UserModel.fromDocument(DocumentSnapshot doc) {
+    return UserModel(
         id: doc.get('id'),
         fullName: doc.get('fullName'),
         email: doc.get('email'),

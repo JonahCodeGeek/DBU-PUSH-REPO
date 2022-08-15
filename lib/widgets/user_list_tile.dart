@@ -5,7 +5,7 @@ import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class UserResult extends StatelessWidget {
-  final User user;
+  final UserModel user;
   const UserResult(this.user);
   @override
   Widget build(BuildContext context) {
