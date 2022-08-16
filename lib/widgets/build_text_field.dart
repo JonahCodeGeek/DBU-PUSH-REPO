@@ -6,14 +6,13 @@ class BuildTextField extends StatelessWidget {
     Key? key,
     required this.nameController,
     required this.textName,
-    required this.giveHintText, required this.readOnly,  this.errorText,
+    required this.giveHintText, required this.readOnly,
   }) : super(key: key);
 
   final TextEditingController nameController;
   final String textName;
   final String giveHintText;
   final bool readOnly;
-  final String? errorText;
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +32,6 @@ class BuildTextField extends StatelessWidget {
             enabled: readOnly,
             controller: nameController,
             decoration: InputDecoration(
-              errorText: errorText,
               hintText: giveHintText,
               //  border: InputBorder.none,
             ),

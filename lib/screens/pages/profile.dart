@@ -4,11 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
 import 'package:dbu_push/providers/get_current_user.dart';
+import 'package:dbu_push/screens/pages/page_navigator.dart';
 import 'package:dbu_push/services/auth_methods.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
+import 'package:dbu_push/utils/helpers/custom_functions.dart.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/build_text_field.dart';
 import 'package:dbu_push/widgets/buttons.dart';
+import 'package:dbu_push/widgets/progress.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
@@ -34,14 +37,11 @@ class _ProfileState extends State<Profile> {
   TextEditingController idController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  bool isBiofiled = true;
-  bool isNamefiled = true;
-  bool isIdfiled = true;
-
   final ImagePicker _picker = ImagePicker();
   File? file;
   bool isFile = false;
   String avatorId = Uuid().v4();
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -53,12 +53,57 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  bool validateName() {
+    if (nameController.text.length < 3 || nameController.text.length > 10) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  bool validatBio() {
+    if (bioController.text.length > 40) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  bool validateId() {
+    if (idController.text.length != 8) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  getUser() async {
+    setState(() {
+      isLoading = true;
+    });
+    DocumentSnapshot docs = await usersDoc.doc(widget.profileId).get();
+    UserModel? getUsers = UserModel.fromDocument(docs);
+
+    setState(() {
+      // user = UserModel.fromDocument(docs);
+      user = getUsers;
+    });
+    nameController.text = user?.fullName ?? '';
+    bioController.text = user?.bio ?? '';
+    idController.text = user?.uId ?? '';
+    phoneController.text = user?.phone ?? '';
+    emailController.text = user?.email ?? '';
+     setState(() {
+      isLoading = false;
+    });
+  }
+
   takePhoto(ImageSource source) async {
     Navigator.pop(context);
     XFile? file =
         await _picker.pickImage(source: source, maxHeight: 675, maxWidth: 960);
     setState(() {
-      this.file = File(file?.path??'');
+      this.file = File(file?.path ?? '');
     });
   }
 
@@ -69,46 +114,63 @@ class _ProfileState extends State<Profile> {
     return imageUrl;
   }
 
-  handleUpdate() async {
-    setState(() {
-      nameController.text.trim().length < 3 ||
-              nameController.text.trim().length > 8
-          ? isNamefiled = false
-          : isNamefiled = true;
-      nameController.text.trim().length > 40
-          ? isBiofiled = false
-          : isBiofiled = true;
-      idController.text.trim().length != 8
-          ? isIdfiled = false
-          : isIdfiled = true;
-    });
+  updateFromCamera() async {
+    await takePhoto(ImageSource.camera);
     String? imageUrl = await uploadImage(file);
-    if (isNamefiled && isBiofiled && isIdfiled) {
+    usersDoc.doc(widget.profileId).update({'avatar': imageUrl});
+    // ignore: use_build_context_synchronously
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: ((context) => PageNavigator(authUser: user)),
+        ));
+  }
+
+  updateFromgallery() async {
+    await takePhoto(ImageSource.gallery);
+    String? imageUrl = await uploadImage(file);
+    usersDoc.doc(widget.profileId).update({'avatar': imageUrl});
+    // ignore: use_build_context_synchronously
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: ((context) => PageNavigator(authUser: user)),
+        ));
+  }
+
+  handleUpdate() async {
+    if (validatBio() && validateName() && validateId()) {
       usersDoc.doc(widget.profileId).update({
         'fullName': nameController.text,
         'bio': bioController.text,
-        'avatar': imageUrl
       });
       setState(() {
         file = null;
         avatorId = Uuid().v4();
       });
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => PageNavigator(authUser: user)),
+          ));
+    } else {
+      if (!validateName()) {
+        // ignore: use_build_context_synchronously
+        return showSnackBar(context,
+            'your name must be 3 to 15 characters only in length', Colors.red);
+      } else if (!validatBio()) {
+        // ignore: use_build_context_synchronously
+        return showSnackBar(
+            context,
+            'your bio character length must be less than 40 in length',
+            Colors.red);
+      } else {
+        // ignore: use_build_context_synchronously
+        return showSnackBar(
+            context, 'Your Id character must be 8 in length', Colors.red);
+      }
     }
-  }
-
-  getUser() async {
-    DocumentSnapshot docs = await usersDoc.doc(widget.profileId).get();
-    UserModel? getUsers = UserModel.fromDocument(docs);
-
-    setState(() {
-      // user = UserModel.fromDocument(docs);
-      user = getUsers;
-    });
-    nameController.text = user?.fullName??'';
-    bioController.text = user?.bio??'';
-    idController.text = user?.uId??'';
-    phoneController.text = user?.phone??'';
-    emailController.text = user?.email??'';
   }
 
   handleLogout() {
@@ -135,7 +197,7 @@ class _ProfileState extends State<Profile> {
                             image: DecorationImage(
                               fit: BoxFit.cover,
                               image: FileImage(
-                                File(file?.path??''),
+                                File(file?.path ?? ''),
                               ),
                             ),
                           ),
@@ -144,7 +206,8 @@ class _ProfileState extends State<Profile> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                                image: CachedNetworkImageProvider(user?.avatar??''),
+                                image: CachedNetworkImageProvider(
+                                    user?.avatar ?? ''),
                                 fit: BoxFit.cover),
                           ),
                         ),
@@ -184,7 +247,7 @@ class _ProfileState extends State<Profile> {
             CircleAvatar(
               radius: 64,
               backgroundColor: Colors.grey,
-              backgroundImage: CachedNetworkImageProvider(user?.avatar??''),
+              backgroundImage: CachedNetworkImageProvider(user?.avatar ?? ''),
             ),
             buildUserInfo(),
           ],
@@ -211,7 +274,8 @@ class _ProfileState extends State<Profile> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                onPressed: () => takePhoto(ImageSource.camera),
+                // onPressed: () => takePhoto(ImageSource.camera),
+                onPressed: updateFromCamera,
                 icon: Icon(
                   Icons.camera_alt,
                   size: 30,
@@ -219,7 +283,8 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               IconButton(
-                onPressed: () => takePhoto(ImageSource.gallery),
+                // onPressed: () => takePhoto(ImageSource.gallery),
+                onPressed: updateFromgallery,
                 icon: Icon(
                   Icons.photo,
                   size: 35,
@@ -290,25 +355,18 @@ class _ProfileState extends State<Profile> {
             nameController: nameController,
             textName: 'FullName',
             giveHintText: 'update your name',
-            errorText: isNamefiled
-                ? null
-                : 'your name character length must be less than 10 and greater than 3',
           ),
           BuildTextField(
             readOnly: true,
             nameController: bioController,
             textName: 'Bio',
             giveHintText: 'update Your bio',
-            errorText: isBiofiled
-                ? null
-                : 'your bio character length must be less than 40',
           ),
           BuildTextField(
             readOnly: true,
             nameController: idController,
             textName: 'Id',
             giveHintText: 'update Your Id',
-            errorText: isIdfiled ? null : 'your id  character length must be 8',
           ),
         ],
       ),
@@ -318,7 +376,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ListView(
+        body:isLoading?circularProgress(): ListView(
       children: [
         buildProfile(),
       ],

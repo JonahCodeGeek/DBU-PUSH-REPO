@@ -11,7 +11,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   runApp(ChangeNotifierProvider(
     create: (context) => GetCurrentUser(),
-    child: DbuPush(),
+    child:const DbuPush(),
   ));
 }
 
