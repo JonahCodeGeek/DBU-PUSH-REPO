@@ -4,11 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/models/user.dart';
 import 'package:dbu_push/providers/get_current_user.dart';
+import 'package:dbu_push/services/auth_methods.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/build_text_field.dart';
 import 'package:dbu_push/widgets/buttons.dart';
-import 'package:dbu_push/widgets/progress.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
@@ -16,7 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-UserModel? currentUser;
+// UserModel? currentUser;
 
 class Profile extends StatefulWidget {
   const Profile({Key? key, required this.profileId}) : super(key: key);
@@ -27,11 +27,17 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   String? currentUserId;
+  UserModel? user;
+  AuthenticationService? service;
   TextEditingController nameController = TextEditingController();
   TextEditingController bioController = TextEditingController();
   TextEditingController idController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  bool isBiofiled = true;
+  bool isNamefiled = true;
+  bool isIdfiled = true;
+
   final ImagePicker _picker = ImagePicker();
   File? file;
   bool isFile = false;
@@ -39,7 +45,9 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    currentUser = Provider.of<GetCurrentUser>(context,listen: false).currentUser;
+    getUser();
+    UserModel? currentUser =
+        Provider.of<GetCurrentUser>(context, listen: false).currentUser;
     setState(() {
       currentUserId = currentUser?.id;
     });
@@ -50,126 +58,139 @@ class _ProfileState extends State<Profile> {
     XFile? file =
         await _picker.pickImage(source: source, maxHeight: 675, maxWidth: 960);
     setState(() {
-      this.file = File(file!.path);
+      this.file = File(file?.path??'');
     });
   }
 
-  Future<String> uploadImage(File imagefile) async {
+  Future<String?> uploadImage(imagefile) async {
     UploadTask uploadTask =
         storage.child('profile_$avatorId.jpg').putFile(imagefile);
-    String imageUrl = await (await uploadTask).ref.getDownloadURL();
+    String? imageUrl = await (await uploadTask).ref.getDownloadURL();
     return imageUrl;
   }
 
   handleUpdate() async {
-    String imageUrl = await uploadImage(file!);
-    usersDoc.doc(currentUserId).update({
-      'fullName': nameController.text,
-      'bio': bioController.text,
-      'avatar': imageUrl
-    });
     setState(() {
-      file = null;
-      avatorId = Uuid().v4();
+      nameController.text.trim().length < 3 ||
+              nameController.text.trim().length > 8
+          ? isNamefiled = false
+          : isNamefiled = true;
+      nameController.text.trim().length > 40
+          ? isBiofiled = false
+          : isBiofiled = true;
+      idController.text.trim().length != 8
+          ? isIdfiled = false
+          : isIdfiled = true;
     });
+    String? imageUrl = await uploadImage(file);
+    if (isNamefiled && isBiofiled && isIdfiled) {
+      usersDoc.doc(widget.profileId).update({
+        'fullName': nameController.text,
+        'bio': bioController.text,
+        'avatar': imageUrl
+      });
+      setState(() {
+        file = null;
+        avatorId = Uuid().v4();
+      });
+    }
+  }
+
+  getUser() async {
+    DocumentSnapshot docs = await usersDoc.doc(widget.profileId).get();
+    UserModel? getUsers = UserModel.fromDocument(docs);
+
+    setState(() {
+      // user = UserModel.fromDocument(docs);
+      user = getUsers;
+    });
+    nameController.text = user?.fullName??'';
+    bioController.text = user?.bio??'';
+    idController.text = user?.uId??'';
+    phoneController.text = user?.phone??'';
+    emailController.text = user?.email??'';
   }
 
   handleLogout() {
-    //
+    service?.signOut();
   }
 
   buildProfile() {
     bool isProfileOwner = widget.profileId == currentUserId;
-    return FutureBuilder<DocumentSnapshot>(
-      future: usersDoc.doc(widget.profileId).get(),
-      builder: ((context, snapshot) {
-        if (!snapshot.hasData) {
-          return circularProgress();
-        }
-
-        UserModel user = UserModel.fromDocument(snapshot.data!);
-        nameController.text = user.fullName!;
-        bioController.text = user.bio!;
-        idController.text = user.uId!;
-        phoneController.text = user.phone!;
-        emailController.text = user.email!;
-        if (isProfileOwner) {
-          isFile = file != null;
-          return Padding(
-            padding: EdgeInsets.only(top: 60),
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 64,
-                      backgroundColor: Colors.grey,
-                      child: isFile
-                          ? Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: FileImage(
-                                    File(file!.path),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                    image:
-                                        CachedNetworkImageProvider(user.avatar),
-                                    fit: BoxFit.cover),
-                              ),
-                            ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: GestureDetector(
-                        child: buildIconButton(AppColors.primaryColor),
-                        onTap: () {
-                          showModalBottomSheet(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16),
-                              ),
-                            ),
-                            context: context,
-                            builder: (context) {
-                              return buildBottomSheet(context);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                buildEditInfo(),
-                buildProfileBody(handleUpdate, handleLogout)
-              ],
-            ),
-          );
-        } else {
-          return Padding(
-            padding: EdgeInsets.only(top: 60),
-            child: Column(
+    if (isProfileOwner) {
+      isFile = file != null;
+      return Padding(
+        padding: EdgeInsets.only(top: 60),
+        child: Column(
+          children: [
+            Stack(
               children: [
                 CircleAvatar(
                   radius: 64,
                   backgroundColor: Colors.grey,
-                  backgroundImage: CachedNetworkImageProvider(user.avatar),
+                  child: isFile
+                      ? Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: FileImage(
+                                File(file?.path??''),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: CachedNetworkImageProvider(user?.avatar??''),
+                                fit: BoxFit.cover),
+                          ),
+                        ),
                 ),
-                buildUserInfo(user),
+                Positioned(
+                  bottom: 0,
+                  right: 4,
+                  child: GestureDetector(
+                    child: buildIconButton(AppColors.primaryColor),
+                    onTap: () {
+                      showModalBottomSheet(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        context: context,
+                        builder: (context) {
+                          return buildBottomSheet(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
-          );
-        }
-      }),
-    );
+            buildEditInfo(),
+            buildProfileBody(handleUpdate, handleLogout)
+          ],
+        ),
+      );
+    } else {
+      return Padding(
+        padding: EdgeInsets.only(top: 60),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 64,
+              backgroundColor: Colors.grey,
+              backgroundImage: CachedNetworkImageProvider(user?.avatar??''),
+            ),
+            buildUserInfo(),
+          ],
+        ),
+      );
+    }
   }
 
   Container buildBottomSheet(BuildContext context) {
@@ -220,7 +241,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Padding buildUserInfo(UserModel user) {
+  Padding buildUserInfo() {
     return Padding(
       padding: EdgeInsets.only(top: 16, left: 16),
       child: Column(
@@ -269,18 +290,25 @@ class _ProfileState extends State<Profile> {
             nameController: nameController,
             textName: 'FullName',
             giveHintText: 'update your name',
+            errorText: isNamefiled
+                ? null
+                : 'your name character length must be less than 10 and greater than 3',
           ),
           BuildTextField(
             readOnly: true,
             nameController: bioController,
             textName: 'Bio',
             giveHintText: 'update Your bio',
+            errorText: isBiofiled
+                ? null
+                : 'your bio character length must be less than 40',
           ),
           BuildTextField(
             readOnly: true,
             nameController: idController,
             textName: 'Id',
             giveHintText: 'update Your Id',
+            errorText: isIdfiled ? null : 'your id  character length must be 8',
           ),
         ],
       ),

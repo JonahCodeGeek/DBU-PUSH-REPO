@@ -11,7 +11,8 @@ class GetCurrentUser with ChangeNotifier {
     doc.then(
       (snapshot) => {
         snapshot.docs.forEach((element) async {
-          // await usersDoc.doc(element.id).get();
+          // await usersDoc.doc(element.id).update({
+          // });
           _currentUser = UserModel.fromDocument(element);
           notifyListeners();
         })

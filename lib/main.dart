@@ -30,16 +30,3 @@ class DbuPush extends StatelessWidget {
   }
 }
 
-// class GetCurrentUser with ChangeNotifier {
-//   void getCurrentUser(AsyncSnapshot<User?> snapshot) {
-//     final doc = usersDoc.where('email', isEqualTo: snapshot.data?.email).get();
-//     doc.then(
-//       (snapshot) => {
-//         snapshot.docs.forEach((element) async {
-//           final currentUser = UserModel.fromDocument(element);
-//         })
-//       },
-//     );
-//     notifyListeners();
-//   }
-// }

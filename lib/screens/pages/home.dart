@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class Home extends StatefulWidget {
-  Home({Key? key, required this.user}) : super(key: key);
+ Home({Key? key, required this.user}) : super(key: key);
   UserModel? user;
   @override
   State<Home> createState() => _HomeState();

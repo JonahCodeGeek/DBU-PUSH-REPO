@@ -4,7 +4,6 @@ import 'package:dbu_push/screens/pages/notfications.dart';
 import 'package:dbu_push/screens/pages/private_channel.dart';
 import 'package:dbu_push/screens/pages/public_channels.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
-import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +18,7 @@ class PageNavigator extends StatefulWidget {
 }
 
 class _PageNavigatorState extends State<PageNavigator> {
-  int pageIndex = 0;
+  int pageIndex =1;
   PageController? pageController;
 
   @override
