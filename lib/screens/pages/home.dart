@@ -68,6 +68,11 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     authorize();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: AppColors.scaffoldColor,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
   }
 
   @override

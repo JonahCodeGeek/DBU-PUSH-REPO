@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_unnecessary_containers, sized_box_for_whitespace, prefer_typing_uninitialized_variables
 // ignore_for_file:prefer_const_literals_to_create_immutables
 
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:dbu_push/widgets/app_button.dart';
@@ -80,6 +83,9 @@ class _PublicChannelCardState extends State<PublicChannelCard> {
                     CircleAvatar(
                       backgroundColor: AppColors.primaryColor,
                       radius: 30,
+                      backgroundImage: NetworkImage(
+                        channel[cardIndex]['avatar'],
+                      ),
                     ),
                     VerticalSpacer(10),
                     Text(channel[cardIndex]['name'], //channel information
@@ -106,7 +112,7 @@ class _PublicChannelCardState extends State<PublicChannelCard> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       height: 30,
-                      width: 50,
+                      width: 70,
                     )
                   ],
                 ),
