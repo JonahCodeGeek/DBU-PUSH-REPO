@@ -57,7 +57,7 @@ class _PageNavigatorState extends State<PageNavigator> {
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
         children: [
-          Notfications(),
+          Notifications(),
           Home(
             user: widget.authUser,
           ),

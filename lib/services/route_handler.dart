@@ -5,7 +5,6 @@ import 'package:dbu_push/screens/pages/page_navigator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 class HandelAuthentication extends StatefulWidget {
   const HandelAuthentication({super.key});
   @override
@@ -16,6 +15,7 @@ class _HandelAuthenticationState extends State<HandelAuthentication> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: Builder(
         builder: (context) {
           return StreamBuilder<User?>(
@@ -35,7 +35,7 @@ class _HandelAuthenticationState extends State<HandelAuthentication> {
             },
           );
         }
-      ),
+      )
     );
   }
 }
