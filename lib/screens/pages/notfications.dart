@@ -18,6 +18,8 @@ class _NotificationsState extends State<Notifications> {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   List docId = [];
   List channels = [];
+
+  bool isTeacher = false;
   final CollectionReference database =
       FirebaseFirestore.instance.collection('channels');
 
@@ -37,6 +39,25 @@ class _NotificationsState extends State<Notifications> {
     });
   }
 
+  authorize() async {
+    final query1 = FirebaseFirestore.instance
+        .collection('users')
+        .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .where('role', isEqualTo: 'student')
+        .limit(1);
+    final result = await query1.get();
+    final isStudent = result.docs;
+    if (isStudent.isNotEmpty) {
+      setState(() {
+        isTeacher == false;
+      });
+    } else {
+      setState(() {
+        isTeacher = !isTeacher;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +65,7 @@ class _NotificationsState extends State<Notifications> {
         statusBarColor: AppColors.scaffoldColor,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.dark));
+    authorize();
     listChannels();
   }
 
@@ -55,50 +77,53 @@ class _NotificationsState extends State<Notifications> {
           child: ListView.builder(
               itemCount: channels.length,
               itemBuilder: ((context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      minVerticalPadding: 22,
-                      trailing: Text(channels[index]['created']),
-                      onTap: () {
-                        setState(() {});
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: ((_) =>
-                                PublicDetail(docId: docId.elementAt(index))),
-                          ),
-                        );
-                      },
-                      leading: CircleAvatar(
-                        maxRadius: 30,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(channels[index]['avatar']),
+                return Visibility(
+                  visible: isTeacher,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        minVerticalPadding: 22,
+                        trailing: Text(channels[index]['created']),
+                        onTap: () {
+                          setState(() {});
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: ((_) =>
+                                  PublicDetail(docId: docId.elementAt(index))),
+                            ),
+                          );
+                        },
+                        leading: CircleAvatar(
+                          maxRadius: 30,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(channels[index]['avatar']),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      subtitle: Container(
-                        margin: EdgeInsets.only(top: 10),
-                        child: Text(
-                          channels[index]['username'],
-                          style: GoogleFonts.roboto(fontSize: 14),
+                        subtitle: Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Text(
+                            channels[index]['username'],
+                            style: GoogleFonts.roboto(fontSize: 14),
+                          ),
+                        ),
+                        title: Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Text(
+                            channels[index]['name'],
+                            style: GoogleFonts.roboto(fontSize: 14),
+                          ),
                         ),
                       ),
-                      title: Container(
-                        margin: EdgeInsets.only(top: 10),
-                        child: Text(
-                          channels[index]['name'],
-                          style: GoogleFonts.roboto(fontSize: 14),
-                        ),
-                      ),
-                    ),
-                    Divider(),
-                  ],
+                      Divider(),
+                    ],
+                  ),
                 );
               }))),
     );
