@@ -71,6 +71,10 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  handleLogout() {
+  //
+  }
+
   buildProfile() {
     isProfileOwner = widget.profileId == currentUserId;
     return FutureBuilder<DocumentSnapshot>(
@@ -140,7 +144,7 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
                 buildEditInfo(),
-                buildProfileBody(handleUpdate)
+                buildProfileBody(handleUpdate, handleLogout)
               ],
             ),
           );

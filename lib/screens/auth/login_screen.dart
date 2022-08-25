@@ -1,12 +1,12 @@
-import 'package:dbu_push/Animation/%20FadeAnimation.dart';
-import 'package:dbu_push/screens/Auth/forgot_pwd_screen.dart';
-import 'package:dbu_push/screens/Auth/registration_screen.dart';
+import 'package:dbu_push/animation/%20fade_animation.dart';
+import 'package:dbu_push/screens/auth/forgot_pwd_screen.dart';
+import 'package:dbu_push/screens/auth/registration_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../animation/ fade_animation.dart';
 import '../../services/auth_methods.dart';
 import '../../utils/Theme/app_colors.dart';
 import '../../utils/helpers/custom_functions.dart.dart';

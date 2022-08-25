@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+<<<<<<< HEAD
 
 class UserModel {
+=======
+class User {
+>>>>>>> fe7428cc839bef2b7fce030dc37b23355243f276
   final String? id;
   final String? fullName;
   final String? email;

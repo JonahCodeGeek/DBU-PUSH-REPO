@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../Animation/ FadeAnimation.dart';
+import '../../animation/ fade_animation.dart';
 import '../../utils/Theme/app_colors.dart';
 import '../../utils/helpers/custom_functions.dart.dart';
-import '../Auth/registration_screen.dart';
+import '../auth/registration_screen.dart';
 
 class WelcomeScreenTwo extends StatelessWidget {
   const WelcomeScreenTwo({Key? key}) : super(key: key);
