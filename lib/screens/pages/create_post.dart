@@ -1,14 +1,18 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, unused_import, non_constant_identifier_names, use_build_context_synchronously
 
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import '../../utils/helpers/custom_functions.dart.dart';
 import 'public_channel_detail.dart';
 
@@ -21,6 +25,11 @@ class CreatePost extends StatefulWidget {
 }
 
 class _CreatePostState extends State<CreatePost> {
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+  String backgroundImg = '';
+  String profileId = Uuid().v4();
+
   String post_id = '';
   final CollectionReference posts =
       FirebaseFirestore.instance.collection('posts');
@@ -30,7 +39,10 @@ class _CreatePostState extends State<CreatePost> {
   final List postId = [];
   bool isVisible = false;
   bool isPrivate = false;
+  String channelImage = '';
+  bool iconVisible = true;
   final List channel = [];
+  File? _backImage;
 
   // ignore: unused_field
 
@@ -44,36 +56,85 @@ class _CreatePostState extends State<CreatePost> {
           Colors.red);
     }
     try {
-      return await posts.add({
-        'author': _author.toString(),
-        'channel': widget.docId,
-        'message': _messageController.text.trim(),
-        'dislike': [],
-        'like': [],
-        'comment': [],
-        'media_url': '',
-        'created_at': formatDate(DateTime.now(), [dd, '/', mm, '/', yyyy, ' '])
-            .toString(),
-        'updated_at': formatDate(DateTime.now(), [dd, '/', mm, '/', yyyy, ' '])
-            .toString(),
-      }).then((value) {
+      if (_backImage == null) {
+        try {
+          return await posts.add({
+            'author': _author.toString(),
+            'post_type': isPrivate ? 'private' : 'public',
+            'channel_image': channelImage,
+            'channel': widget.docId,
+            'message': _messageController.text.trim(),
+            'dislike': [],
+            'like': [],
+            'comment': [],
+            'media_url': '',
+            'created_at':
+                formatDate(DateTime.now(), [dd, '/', mm, '/', yyyy, ' '])
+                    .toString(),
+            'updated_at':
+                formatDate(DateTime.now(), [dd, '/', mm, '/', yyyy, ' '])
+                    .toString(),
+          }).then((value) {
+            setState(() {
+              postId.add(value.id);
+            });
+          }).then((value) async {
+            await channels.doc(widget.docId).update(
+              {
+                'posts': FieldValue.arrayUnion(postId),
+              },
+            );
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: ((context) => PublicDetail(docId: widget.docId)),
+              ),
+            );
+            return showSnackBar(
+                context, 'Message posted successfully!!', Colors.green);
+          });
+        } catch (e) {
+          return showSnackBar(context, e.toString(), Colors.red);
+        }
+      } else {
+        String imageUrl = await uploadBackImg(_backImage!);
         setState(() {
-          postId.add(value.id);
+          backgroundImg = imageUrl;
         });
-      }).then((value) async {
-        await channels.doc(widget.docId).update(
-          {
-            'posts': FieldValue.arrayUnion(postId),
-          },
-        );
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: ((context) => PublicDetail(docId: widget.docId)),
-          ),
-        );
-        return showSnackBar(
-            context, 'Message posted successfully!!', Colors.green);
-      });
+        return await posts.add({
+          'author': _author.toString(),
+          'post_type': isPrivate ? 'private' : 'public',
+          'channel': widget.docId,
+          'channel_image': channelImage,
+          'message': _messageController.text.trim(),
+          'dislike': [],
+          'like': [],
+          'comment': [],
+          'media_url': backgroundImg == '' ? '' : imageUrl,
+          'created_at':
+              formatDate(DateTime.now(), [dd, '/', mm, '/', yyyy, ' '])
+                  .toString(),
+          'updated_at':
+              formatDate(DateTime.now(), [dd, '/', mm, '/', yyyy, ' '])
+                  .toString(),
+        }).then((value) {
+          setState(() {
+            postId.add(value.id);
+          });
+        }).then((value) async {
+          await channels.doc(widget.docId).update(
+            {
+              'posts': FieldValue.arrayUnion(postId),
+            },
+          );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: ((context) => PublicDetail(docId: widget.docId)),
+            ),
+          );
+          return showSnackBar(
+              context, 'Message posted successfully!!', Colors.green);
+        });
+      }
     } catch (e) {
       return showSnackBar(context, e.toString(), Colors.red);
     }
@@ -86,8 +147,13 @@ class _CreatePostState extends State<CreatePost> {
       setState(() {
         return channel.add(element);
       });
-      Future.delayed(Duration(seconds: 2), () {
-        if (channel[0]['type' == 'private']) {
+      Future.delayed(Duration(seconds: 0), () {
+        if (channel[0]['type'] == 'public') {
+          setState(() {
+            channelImage = channel[0]['avatar'];
+          });
+        }
+        if (channel[0]['type'] == 'private') {
           setState(() {
             isPrivate = true;
           });
@@ -100,16 +166,31 @@ class _CreatePostState extends State<CreatePost> {
     });
   }
 
+  Future<String> uploadBackImg(File imageFile) async {
+    UploadTask uploadTask = storage
+        .ref('/channel/background image/$profileId.jpg')
+        .putFile(imageFile);
+    String imageUrl = await (await uploadTask).ref.getDownloadURL();
+    return imageUrl;
+  }
+
+  backImage(ImageSource source) async {
+    XFile? image = await ImagePicker()
+        .pickImage(source: source, maxHeight: 675, maxWidth: 960);
+    setState(() {
+      _backImage = File(image!.path);
+      backgroundImg = _backImage!.path;
+    });
+  }
+
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _messageController.dispose();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getResult();
   }
@@ -171,7 +252,7 @@ class _CreatePostState extends State<CreatePost> {
                   controller: _messageController,
                   autofocus: true,
                   cursorHeight: 22,
-                  maxLines: 20,
+                  maxLines: 10,
                   minLines: 10,
                   decoration: InputDecoration(
                     hintText: 'Write something  ',
@@ -184,14 +265,67 @@ class _CreatePostState extends State<CreatePost> {
               Visibility(
                 visible: true,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 70.0),
-                  child: Container(
-                    width: 300,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                  child: Stack(
+                    children: [
+                      _backImage == null
+                          ? Container(
+                              width: double.maxFinite,
+                              height: 250,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                backImage(ImageSource.gallery);
+                              },
+                              child: Container(
+                                width: double.maxFinite,
+                                height: 250,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: FileImage(
+                                      File(_backImage!.path),
+                                    ),
+                                  ),
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                      Visibility(
+                        visible: backgroundImg == '' ? true : false,
+                        child: GestureDetector(
+                          onTap: () {
+                            backImage(ImageSource.gallery);
+                          },
+                          child: Column(
+                            children: [
+                              VerticalSpacer(90),
+                              Center(
+                                child: Icon(
+                                  Icons.add,
+                                  size: 40,
+                                  color: AppColors.scaffoldColor,
+                                ),
+                              ),
+                              Center(
+                                child: Text(
+                                  'Add image to a post',
+                                  style: GoogleFonts.roboto(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w300,
+                                      color: AppColors.scaffoldColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),

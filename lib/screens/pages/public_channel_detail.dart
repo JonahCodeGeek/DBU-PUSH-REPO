@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_literals_to_create_immutables, avoid_unnecessary_containers, prefer_interpolation_to_compose_strings
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_literals_to_create_immutables, avoid_unnecessary_containers, prefer_interpolation_to_compose_strings, unused_import
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbu_push/screens/pages/create_post.dart';
+import 'package:dbu_push/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,6 +34,8 @@ class _PublicDetailState extends State<PublicDetail> {
       });
     });
   }
+
+  Future<void> showPosts() async {}
 
   @override
   initState() {
@@ -174,22 +177,36 @@ class _PublicDetailState extends State<PublicDetail> {
                   ),
                 ),
 
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      channel[index]['members'].length.toString() + ' members',
-                      style: GoogleFonts.roboto(
-                          fontSize: 14,
-                          color: AppColors.textColor3,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ),
-                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: Row(
+                            children: [
+                              Text(
+                                channel[index]['members'].length.toString(),
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: AppColors.textColor1,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                ' members',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: AppColors.textColor3,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(right: 18.0),
                       child: AppButton(
@@ -219,6 +236,14 @@ class _PublicDetailState extends State<PublicDetail> {
                   endIndent: 5,
                   color: AppColors.textColor3,
                 ),
+                //showPosts
+                VerticalSpacer(100),
+                Visibility(
+                  visible: true,
+                  child: OnboardingText(
+                    lightText: 'There are no posts yet',
+                  ),
+                )
               ],
             );
           }),

@@ -74,7 +74,8 @@ class _CreateChannelsState extends State<CreateChannels> {
           _channelUserNameController.text != '' ||
           _channelKeyController.text != '' ||
           _bioController.text != '') {
-        String imageUrl = await uploadBackImg(_backImage!);
+        String imageUrl =
+            _backImage == null ? '' : await uploadBackImg(_backImage!);
         String profileImage = await uploadProfile(_profileImage!);
         return _channels.add({
           'creator': _userId,

@@ -13,8 +13,11 @@ import 'package:dbu_push/widgets/app_button.dart';
 import 'package:dbu_push/widgets/app_text.dart';
 import 'package:dbu_push/widgets/build_no_content_search.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
+import 'package:dbu_push/widgets/default_posts.dart';
 import 'package:dbu_push/widgets/progress.dart';
+import 'package:dbu_push/widgets/public_channel_posts.dart';
 import 'package:dbu_push/widgets/user_list_tile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -48,7 +51,7 @@ class _HomeState extends State<Home> {
   authorize() async {
     final query1 = database
         .collection('users')
-        .where('id', isEqualTo: currentUser?.id)
+        .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
         .where('role', isEqualTo: 'student')
         .limit(1);
     final result = await query1.get();
@@ -105,6 +108,7 @@ class _HomeState extends State<Home> {
       ),
       backgroundColor: AppColors.scaffoldColor,
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           children: [
             Align(
@@ -115,7 +119,7 @@ class _HomeState extends State<Home> {
                   'Suggestions',
                   style: GoogleFonts.roboto(
                     fontWeight: FontWeight.w400,
-                    fontSize: 24,
+                    fontSize: 20,
                   ),
                 ),
               ),
@@ -129,6 +133,26 @@ class _HomeState extends State<Home> {
                 ],
               ),
             ),
+            Divider(height: 20),
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15.0, top: 10),
+                child: Text(
+                  'Latest News',
+                  style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ),
+            //default (university's post only)
+
+            DefaultPosts(),
+            //public channel posts
+
+            PublicChannelPosts(),
           ],
         ),
       ),

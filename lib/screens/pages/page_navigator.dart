@@ -58,7 +58,7 @@ class _PageNavigatorState extends State<PageNavigator> {
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
         children: [
-          Notfications(),
+          Notifications(),
           Home(),
           PrivateChannels(),
           PublicChannels(),
@@ -72,7 +72,7 @@ class _PageNavigatorState extends State<PageNavigator> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.notifications,
+              Icons.personal_injury,
               size: 30.0,
             ),
           ),
