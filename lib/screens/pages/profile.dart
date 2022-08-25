@@ -12,6 +12,7 @@ import 'package:dbu_push/utils/helpers/firestore_cloud_reference.dart';
 import 'package:dbu_push/widgets/build_text_field.dart';
 import 'package:dbu_push/widgets/buttons.dart';
 import 'package:dbu_push/widgets/progress.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dbu_push/widgets/circle_button.dart';
@@ -19,7 +20,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-// UserModel? currentUser;
 
 class Profile extends StatefulWidget {
   const Profile({Key? key, required this.profileId}) : super(key: key);
@@ -47,14 +47,15 @@ class _ProfileState extends State<Profile> {
     super.initState();
     getUser();
     UserModel? currentUser =
-        Provider.of<GetCurrentUser>(context, listen: false).currentUser;
+        Provider.of<GetCurrentUser>(context, listen:false).currentUser;
     setState(() {
       currentUserId = currentUser?.id;
     });
   }
 
   bool validateName() {
-    if (nameController.text.length < 3 || nameController.text.length > 10) {
+    if (nameController.text.trim().length < 3 ||
+        nameController.text.trim().length > 10) {
       return false;
     } else {
       return true;
@@ -62,7 +63,7 @@ class _ProfileState extends State<Profile> {
   }
 
   bool validatBio() {
-    if (bioController.text.length > 40) {
+    if (bioController.text.trim().length > 40) {
       return false;
     } else {
       return true;
@@ -70,7 +71,7 @@ class _ProfileState extends State<Profile> {
   }
 
   bool validateId() {
-    if (idController.text.length != 8) {
+    if (idController.text.trim().length != 8) {
       return false;
     } else {
       return true;
@@ -81,19 +82,30 @@ class _ProfileState extends State<Profile> {
     setState(() {
       isLoading = true;
     });
-    DocumentSnapshot docs = await usersDoc.doc(widget.profileId).get();
-    UserModel? getUsers = UserModel.fromDocument(docs);
-
+    // DocumentSnapshot docs = await usersDoc.doc(widget.profileId).get();
+    // final doc = usersDoc.where('id', isEqualTo: currentUserId).get();
+    //  final docs=doc.then((snapshot) => {
+    //       snapshot.docs.forEach((element) {
+    //         UserModel? getUsers = UserModel.fromDocument(element);
+    //         setState(() {
+    //           user = getUsers;
+    //         });
+    //       })
+    //     }
+    //     );
+    // UserModel? getUsers = UserModel.fromDocument(docs);
+    final users = context.read<GetUsers>();
+    users.getUser(user);
     setState(() {
-      // user = UserModel.fromDocument(docs);
-      user = getUsers;
+      // UserModel? user = Provider.of<GetUsers>(context, listen: false).user;
+      user = Provider.of<GetUsers>(context, listen: false).user;
     });
     nameController.text = user?.fullName ?? '';
     bioController.text = user?.bio ?? '';
     idController.text = user?.uId ?? '';
     phoneController.text = user?.phone ?? '';
     emailController.text = user?.email ?? '';
-     setState(() {
+    setState(() {
       isLoading = false;
     });
   }
@@ -117,7 +129,14 @@ class _ProfileState extends State<Profile> {
   updateFromCamera() async {
     await takePhoto(ImageSource.camera);
     String? imageUrl = await uploadImage(file);
-    usersDoc.doc(widget.profileId).update({'avatar': imageUrl});
+    usersDoc.where('id', isEqualTo: widget.profileId).get().then((snapshot) => {
+          snapshot.docs.forEach((element) {
+            usersDoc.doc(element.id).update({
+              'avatar': imageUrl
+            });
+          })
+        });
+    // usersDoc.doc(widget.profileId).update({'avatar': imageUrl});
     // ignore: use_build_context_synchronously
     Navigator.push(
         context,
@@ -129,7 +148,14 @@ class _ProfileState extends State<Profile> {
   updateFromgallery() async {
     await takePhoto(ImageSource.gallery);
     String? imageUrl = await uploadImage(file);
-    usersDoc.doc(widget.profileId).update({'avatar': imageUrl});
+    usersDoc.where('id', isEqualTo: widget.profileId).get().then((snapshot) => {
+          snapshot.docs.forEach((element) {
+            usersDoc.doc(element.id).update({
+              'avatar': imageUrl
+            });
+          })
+        });
+    // usersDoc.doc(widget.profileId).update({'avatar': imageUrl});
     // ignore: use_build_context_synchronously
     Navigator.push(
         context,
@@ -140,10 +166,21 @@ class _ProfileState extends State<Profile> {
 
   handleUpdate() async {
     if (validatBio() && validateName() && validateId()) {
-      usersDoc.doc(widget.profileId).update({
-        'fullName': nameController.text,
-        'bio': bioController.text,
-      });
+      // usersDoc.doc(widget.profileId).update({
+      //   'fullName': nameController.text,
+      //   'bio': bioController.text,
+      // });
+      usersDoc
+          .where('id', isEqualTo: widget.profileId)
+          .get()
+          .then((snapshot) => {
+                snapshot.docs.forEach((element) {
+                  usersDoc.doc(element.id).update({
+                    'fullName': nameController.text,
+                    'bio': bioController.text,
+                  });
+                })
+              });
       setState(() {
         file = null;
         avatorId = Uuid().v4();
@@ -174,7 +211,8 @@ class _ProfileState extends State<Profile> {
   }
 
   handleLogout() {
-    service?.signOut();
+    Navigator.pop(context);
+    AuthenticationService(FirebaseAuth.instance, context).signOut();
   }
 
   buildProfile() {
@@ -249,7 +287,13 @@ class _ProfileState extends State<Profile> {
               backgroundColor: Colors.grey,
               backgroundImage: CachedNetworkImageProvider(user?.avatar ?? ''),
             ),
-            buildUserInfo(),
+            BuildUserInfo(
+              nameController: nameController,
+              bioController: bioController,
+              idController: idController,
+              emailController: emailController,
+              phoneController: phoneController,
+            )
           ],
         ),
       );
@@ -306,48 +350,9 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Padding buildUserInfo() {
-    return Padding(
-      padding: EdgeInsets.only(top: 16, left: 16),
-      child: Column(
-        children: [
-          BuildTextField(
-            readOnly: false,
-            nameController: nameController,
-            textName: 'FullName',
-            giveHintText: '',
-          ),
-          BuildTextField(
-            readOnly: false,
-            nameController: emailController,
-            textName: 'Email',
-            giveHintText: '',
-          ),
-          BuildTextField(
-              nameController: phoneController,
-              textName: 'Phone',
-              giveHintText: '',
-              readOnly: false),
-          BuildTextField(
-            readOnly: false,
-            nameController: bioController,
-            textName: 'Bio',
-            giveHintText: '',
-          ),
-          BuildTextField(
-            readOnly: false,
-            nameController: idController,
-            textName: 'Id',
-            giveHintText: '',
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget buildEditInfo() {
     return Padding(
-      padding: EdgeInsets.only(top: 16, left: 16),
+      padding: EdgeInsets.only(top: 16, left: 16, right: 10),
       child: Column(
         children: [
           BuildTextField(
@@ -376,10 +381,12 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:isLoading?circularProgress(): ListView(
-      children: [
-        buildProfile(),
-      ],
-    ));
+        body: isLoading
+            ? circularProgress()
+            : ListView(
+                children: [
+                  buildProfile(),
+                ],
+              ));
   }
 }

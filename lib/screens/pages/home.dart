@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dbu_push/models/channel.dart';
 import 'package:dbu_push/models/user.dart';
 import 'package:dbu_push/screens/pages/create_channels.dart';
 import 'package:dbu_push/screens/pages/profile.dart';
@@ -13,20 +14,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class Home extends StatefulWidget {
- Home({Key? key, required this.user}) : super(key: key);
+  Home({Key? key, required this.user}) : super(key: key);
   UserModel? user;
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-
   tapProfile() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: ((context) => Profile(
-              profileId:widget.user?.id,
+              profileId: widget.user?.id,
             )),
       ),
     );
@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
                 icon: Icons.search_rounded,
                 iconSize: 35,
                 onPressed: () {
-                  showSearch(context: context, delegate: ContentSearch());
+                  showSearch(context: context, delegate: ChannelSearch());
                 },
               ),
 
@@ -70,7 +70,7 @@ class _HomeState extends State<Home> {
                       radius: 17.5,
                       backgroundColor: Colors.grey,
                       backgroundImage:
-                          CachedNetworkImageProvider(widget.user?.avatar??''),
+                          CachedNetworkImageProvider(widget.user?.avatar ?? ''),
                     ),
                   ),
                 ),
@@ -137,6 +137,7 @@ class ContentSearch extends SearchDelegate {
           return BuildNoContent();
         }
         List<UserResult> searchList = [];
+
         snapshot.data?.docs.map((doc) {
           UserModel user = UserModel.fromDocument(doc);
           UserResult results = UserResult(user);
@@ -149,3 +150,64 @@ class ContentSearch extends SearchDelegate {
     );
   }
 }
+
+
+class ChannelSearch extends SearchDelegate {
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          query = '';
+        },
+        icon: Icon(Icons.clear),
+      ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          close(context, null);
+        },
+        icon: Icon(Icons.arrow_back));
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return buildStream();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return buildStream();
+  }
+
+  StreamBuilder<QuerySnapshot<Object?>> buildStream() {
+    return StreamBuilder<QuerySnapshot>(
+      stream:
+          channelsDoc.where('username', isGreaterThanOrEqualTo: query).snapshots(),
+      builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return circularProgress();
+        }
+        if (query.isEmpty) {
+          return BuildNoContent();
+        }
+        List<ChannelResult> searchList = [];
+
+        snapshot.data?.docs.map((doc) {
+          ChannelModel channel = ChannelModel.fromDocument(doc);
+          ChannelResult results = ChannelResult(channel);
+          searchList.add(results);
+        }).toList();
+        return ListView(
+          children: searchList,
+        );
+      }),
+    );
+  }
+}
+
+

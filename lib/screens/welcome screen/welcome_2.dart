@@ -41,7 +41,7 @@ class WelcomeScreenTwo extends StatelessWidget {
                   height: 250,
                 ),
               ),
-              VerticalSpacer(180),
+              VerticalSpacer(165),
               Padding(
                 padding: EdgeInsets.only(right: 8.0),
                 child: Align(

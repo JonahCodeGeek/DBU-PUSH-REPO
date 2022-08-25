@@ -9,10 +9,15 @@ import 'utils/Theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(ChangeNotifierProvider(
-    create: (context) => GetCurrentUser(),
-    child:const DbuPush(),
-  ));
+  // runApp(ChangeNotifierProvider(
+  //   create: (context) => GetCurrentUser(),
+  //   child:const DbuPush(),
+  // ));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider<GetCurrentUser>(create: (context) => GetCurrentUser()),
+    ChangeNotifierProvider<GetUsers>(create: ((context) => GetUsers()))
+  ],
+  child:DbuPush(),));
 }
 
 class DbuPush extends StatelessWidget {
@@ -29,4 +34,3 @@ class DbuPush extends StatelessWidget {
     );
   }
 }
-

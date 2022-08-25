@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dbu_push/models/channel.dart';
 import 'package:dbu_push/models/user.dart';
 import 'package:dbu_push/screens/pages/profile.dart';
 import 'package:dbu_push/utils/Theme/app_colors.dart';
@@ -34,6 +35,51 @@ class UserResult extends StatelessWidget {
               ),
               subtitle: Text(
                 user.email!,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          Divider(
+            height: 2.0,
+            color: Colors.white54,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChannelResult extends StatelessWidget {
+  final ChannelModel channel;
+  const ChannelResult(this.channel);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.primaryColor.withOpacity(0.7),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: ((context) => Profile(profileId:channel.id)),
+                ),
+              );
+            },
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.grey,
+                backgroundImage:
+                    CachedNetworkImageProvider(channel.avatar ?? ''),
+              ),
+              title: Text(
+                channel.username!,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                channel.type!,
                 style: TextStyle(color: Colors.white),
               ),
             ),

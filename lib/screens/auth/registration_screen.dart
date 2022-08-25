@@ -364,7 +364,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-            VerticalSpacer(79.8),
+            VerticalSpacer(65),
             Align(
               alignment: Alignment.bottomCenter,
               child: AppButton(
