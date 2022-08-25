@@ -1,8 +1,5 @@
 import 'package:dbu_push/screens/main_screen.dart';
-<<<<<<< HEAD
-=======
 
->>>>>>> fe7428cc839bef2b7fce030dc37b23355243f276
 import 'package:dbu_push/screens/pages/page_navigator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
