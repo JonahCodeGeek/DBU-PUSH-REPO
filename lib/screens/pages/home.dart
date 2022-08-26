@@ -42,7 +42,7 @@ class _HomeState extends State<Home> {
       context,
       MaterialPageRoute(
         builder: ((context) => Profile(
-              profileId: currentUser?.id,
+              profileId: FirebaseAuth.instance.currentUser!.uid,
             )),
       ),
     );
